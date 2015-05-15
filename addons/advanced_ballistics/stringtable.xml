@@ -27,6 +27,7 @@
         </Key>
         <Key ID="STR_ACE_AdvancedBallistics_DisplayName">
             <English>Advanced Ballistics</English>
+            <German>Erweiterte Ballistik</German>
             <Polish>Zaawansowana balistyka</Polish>
         </Key>
         <Key ID="STR_ACE_AdvancedBallistics_enabled_DisplayName">
