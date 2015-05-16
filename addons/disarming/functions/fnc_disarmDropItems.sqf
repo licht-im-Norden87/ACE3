@@ -20,6 +20,9 @@
 
 #define TIME_MAX_WAIT 5
 
+private ["_fncSumArray", "_return", "_holder", "_dropPos", "_targetMagazinesStart", "_holderMagazinesStart", "_xClassname", "_xAmmo", "_targetMagazinesEnd", "_holderMagazinesEnd", "_holderItemsStart", "_targetItemsStart", "_addToCrateClassnames", "_addToCrateCount", "_index", "_holderItemsEnd", "_targetItemsEnd", "_holderIsEmpty"];
+
+
 PARAMS_3(_caller,_target,_listOfItemsToRemove);
 DEFAULT_PARAM(3,_doNotDropAmmo,false); //By default units drop all weapon mags when dropping a weapon
 
@@ -76,7 +79,7 @@ _holderMagazinesStart = magazinesAmmoCargo _holder;
 
 {
     EXPLODE_2_PVT(_x,_xClassname,_xAmmo);
-    if ((_xClassname in _listOfItemsToRemove) && {!(_xClassname in UNIQUE_MAGAZINES)}) then {
+    if ((_xClassname in _listOfItemsToRemove) && {(getNumber (configFile >> "CfgMagazines" >> _xClassname >> "ACE_isUnique")) == 0}) then {
         _holder addMagazineAmmoCargo [_xClassname, 1, _xAmmo];
         _target removeMagazine _xClassname;
     };
@@ -86,7 +89,7 @@ _targetMagazinesEnd = magazinesAmmo _target;
 _holderMagazinesEnd = magazinesAmmoCargo _holder;
 
 //Verify Mags dropped from unit:
-if ( ({((_x select 0) in _listOfItemsToRemove) && {!((_x select 0) in UNIQUE_MAGAZINES)}} count _targetMagazinesEnd) != 0) exitWith {
+if (({((_x select 0) in _listOfItemsToRemove) && {(getNumber (configFile >> "CfgMagazines" >> (_x select 0) >> "ACE_isUnique")) == 0}} count _targetMagazinesEnd) != 0) exitWith {
     _holder setVariable [QGVAR(holderInUse), false];
     [_caller, _target, "Debug: Didn't Remove Magazines"] call FUNC(eventTargetFinish);
 };
@@ -99,7 +102,7 @@ if (!([_targetMagazinesStart, _targetMagazinesEnd, _holderMagazinesStart, _holde
 
 //Remove Items, Assigned Items and NVG
 _holderItemsStart = getitemCargo _holder;
-_targetItemsStart = (assignedItems _target) + (items _target);
+_targetItemsStart = (assignedItems _target) + (items _target) - (weapons _target);
 if ((headgear _target) != "") then {_targetItemsStart pushBack (headgear _target);};
 if ((goggles _target) != "") then {_targetItemsStart pushBack (goggles _target);};
 
@@ -129,7 +132,7 @@ _addToCrateCount = [];
 } forEach _addToCrateClassnames;
 
 _holderItemsEnd = getitemCargo _holder;
-_targetItemsEnd = (assignedItems _target) + (items _target);
+_targetItemsEnd = (assignedItems _target) + (items _target) - (weapons _target);
 if ((headgear _target) != "") then {_targetItemsEnd pushBack (headgear _target);};
 if ((goggles _target) != "") then {_targetItemsEnd pushBack (goggles _target);};
 
@@ -143,6 +146,16 @@ if ((([_holderItemsEnd select 1] call _fncSumArray) - ([_holderItemsStart select
     [_caller, _target, "Debug: Items Not Added to Holder"] call FUNC(eventTargetFinish);
 };
 
+//Script drop uniforms/vest if empty
+if (((uniform _target) != "") && {(uniform _target) in _listOfItemsToRemove} && {(uniformItems _target) isEqualTo []}) then {
+    _holder addItemCargoGlobal [(uniform _target), 1];
+    removeUniform _target;
+};
+if (((vest _target) != "") && {(vest _target) in _listOfItemsToRemove} && {(vestItems _target) isEqualTo []}) then {
+    _holder addItemCargoGlobal [(vest _target), 1];
+    removeVest _target;
+};
+
 
 //If holder is still empty, it will be 'garbage collected' while we wait for the drop 'action' to take place
 //So add a dummy item and just remove at the end
@@ -154,6 +167,8 @@ if (_holderIsEmpty) then {
 
 //Start the PFEH to do the actions (which could take >1 frame)
 [{
+    private ["_needToRemoveWeapon", "_needToRemoveMagazines", "_needToRemoveBackpack", "_needToRemoveVest", "_needToRemoveUniform", "_error", "_magsToPickup", "_index", "_magazinesInHolder"];
+
     PARAMS_2(_args,_pfID);
     EXPLODE_8_PVT(_args,_caller,_target,_listOfItemsToRemove,_holder,_holderIsEmpty,_maxWaitTime,_doNotDropAmmo,_startingMagazines);
 

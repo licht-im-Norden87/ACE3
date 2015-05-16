@@ -14,7 +14,7 @@
  */
 #include "script_component.hpp"
 
-private ["_playerDir", "_textTop", "_textCenterBig", "_textCenterLine1Left", "_textCenterLine2Left", "_textCenterLine3Left", "_textCenterLine1Right", "_textCenterLine2Right", "_textCenterLine3Right", "_textInfoLine1", "_textInfoLine2", "_temperature", "_humidity", "_windSpeed", "_windDir", "_newWindSpeed", "_windSource", "_height"];
+private ["_playerDir", "_textTop", "_textCenterBig", "_textCenterLine1Left", "_textCenterLine2Left", "_textCenterLine3Left", "_textCenterLine1Right", "_textCenterLine2Right", "_textCenterLine3Right", "_textInfoLine1", "_textInfoLine2", "_temperature", "_humidity", "_windSpeed", "_windDir"];
 
 [] call FUNC(collectData);
 
@@ -34,10 +34,11 @@ _textInfoLine2 = "";
 _windSpeed = call FUNC(measureWindSpeed);
 _windDir = (ACE_wind select 0) atan2 (ACE_wind select 1);
 
-_temperature = GET_TEMPERATURE_AT_HEIGHT((getPosASL ACE_player) select 2);
-_humidity = EGVAR(weather,currentHumidity);
-
 _playerDir = getDir ACE_player;
+_playerAltitude = (getPosASL ACE_player) select 2;
+
+_temperature = _playerAltitude call EFUNC(weather,calculateTemperatureAtHeight);
+_humidity = EGVAR(weather,currentHumidity);
 
 GVAR(Direction) = 4 * floor(_playerDir / 90);
 if (_playerDir % 90 > 10) then { GVAR(Direction) = GVAR(Direction) + 1};
@@ -88,7 +89,7 @@ switch (GVAR(Menu)) do {
         if (!GVAR(MinAvgMax)) then {
             if (missionNamespace getVariable [QEGVAR(advanced_ballistics,enabled), false]) then {
                 _textCenterBig = Str(round(abs(sin(GVAR(RefHeading) - _playerDir) * _windSpeed) * 10) / 10);
-                _textInfoLine1 = format["%1 m/s @ %2", round((cos(_playerDir - _windDir) * _windSpeed) * 10) / 10, round(_playerDir)];
+                _textInfoLine1 = format["%1 m/s @ %2", round((abs(cos(_playerDir - _windDir)) * _windSpeed) * 10) / 10, round(_playerDir)];
             } else {
                 _textCenterBig = Str(round(abs(sin(GVAR(RefHeading)) * _windSpeed) * 10) / 10);
                 _textInfoLine1 = format["%1 m/s @ %2", round(_windSpeed * 10) / 10, round(_windDir)];
@@ -120,7 +121,7 @@ switch (GVAR(Menu)) do {
         if (!GVAR(MinAvgMax)) then {
             if (missionNamespace getVariable [QEGVAR(advanced_ballistics,enabled), false]) then {
                 _textCenterBig = Str(round(abs(cos(GVAR(RefHeading) - _playerDir) * _windSpeed) * 10) / 10);
-                _textInfoLine1 = format["%1 m/s @ %2", round((cos(_playerDir - _windDir) * _windSpeed) * 10) / 10, round(_playerDir)];
+                _textInfoLine1 = format["%1 m/s @ %2", round((abs(cos(_playerDir - _windDir)) * _windSpeed) * 10) / 10, round(_playerDir)];
             } else {
                 _textCenterBig = Str(round(abs(cos(GVAR(RefHeading)) * _windSpeed) * 10) / 10);
                 _textInfoLine1 = format["%1 m/s @ %2", round(_windSpeed * 10) / 10, round(_windDir)];
@@ -174,7 +175,7 @@ switch (GVAR(Menu)) do {
     };
     case 6: { // BARO
         if (!GVAR(MinAvgMax)) then {
-            _textCenterBig = Str(round((1013.25 * exp(-(EGVAR(weather,Altitude) + ((getPosASL ACE_player) select 2)) / 7990) - 10 * overcast) * 10) / 10);
+            _textCenterBig = Str(round((_playerAltitude call EFUNC(weather,calculateBarometricPressure)) * 10) / 10);
         } else {
             _textCenterLine1Left = "Min";
             _textCenterLine2Left = "Avg";
@@ -186,7 +187,7 @@ switch (GVAR(Menu)) do {
     };
     case 7: { // ALTITUDE
         if (!GVAR(MinAvgMax)) then {
-            _textCenterBig = Str(round(EGVAR(weather,Altitude) + ((getPosASL ACE_player) select 2)));
+            _textCenterBig = Str(round(EGVAR(weather,Altitude) + _playerAltitude));
         } else {
             _textCenterLine1Left = "Min";
             _textCenterLine2Left = "Avg";
@@ -198,7 +199,7 @@ switch (GVAR(Menu)) do {
     };
     case 8: { // User Screen 1
         _textCenterLine1Left = Str(round(_playerDir));
-        _textCenterLine2Left = Str(round(EGVAR(weather,Altitude) + ((getPosASL ACE_player) select 2)));
+        _textCenterLine2Left = Str(round(EGVAR(weather,Altitude) + _playerAltitude));
         _textCenterLine3Left = Str(round(abs(_windSpeed) * 10) / 10);
         _textCenterLine1Right = GVAR(Directions) select GVAR(Direction);
         _textCenterLine2Right = "m";
@@ -207,7 +208,7 @@ switch (GVAR(Menu)) do {
     case 9: { // User Screen 2
         _textCenterLine1Left = Str(round(_temperature * 10) / 10);
         _textCenterLine2Left = Str(round(_humidity * 100 * 10) / 10);
-        _textCenterLine3Left = Str(round((1013.25 * exp(-(EGVAR(weather,Altitude) + ((getPosASL ACE_player) select 2)) / 7990) - 10 * overcast) * 10) / 10);
+        _textCenterLine3Left = Str(round((_playerAltitude call EFUNC(weather,calculateBarometricPressure)) * 10) / 10);
         _textCenterLine1Right = "C";
         _textCenterLine2Right = "%";
         _textCenterLine3Right = "hPA";

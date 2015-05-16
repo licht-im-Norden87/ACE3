@@ -17,7 +17,9 @@
 
 PARAMS_1(_target);
 
-_allItems = ((weapons _target) + (magazines _target) + (items _target) + (assignedItems _target));
+private ["_allItems", "_classnamesCount", "_index", "_uniqueClassnames"];
+
+_allItems = (((items _target) + (assignedItems _target)) - (weapons _target)) + (weapons _target) + (magazines _target);
 
 if ((backpack _target) != "") then {
     _allItems pushBack (backpack _target);

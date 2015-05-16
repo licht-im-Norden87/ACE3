@@ -19,8 +19,8 @@ if (GVAR(WindInfo)) exitWith {
     0 cutText ["", "PLAIN"];
     true
 };
-if (underwater ACE_player) exitWith { true };
-if (vehicle ACE_player != ACE_player) exitWith { true };
+if (underwater ACE_player) exitWith { false };
+if (vehicle ACE_player != ACE_player) exitWith { false };
 
 2 cutText ["", "PLAIN"];
 EGVAR(advanced_ballistics,Protractor) = false;
@@ -28,23 +28,22 @@ EGVAR(advanced_ballistics,Protractor) = false;
 GVAR(WindInfo) = true;
 
 [{
-    private ["_windSpeed", "_windDir", "_playerDir", "_windIndex", "_windColor", "_newWindSpeed", "_windSource", "_height"];
-    
+    private ["_windSpeed", "_windDir", "_playerDir", "_windIndex", "_windColor"];
+
     if !(GVAR(WindInfo) && !(underwater ACE_player) && vehicle ACE_player == ACE_player) exitWith {
         GVAR(WindInfo) = false;
         0 cutText ["", "PLAIN"];
         [_this select 1] call cba_fnc_removePerFrameHandler;
     };
-    
+
     _windIndex = 12;
     _windColor = [1, 1, 1, 1];
-
-    // Toogle behaviour depending on ace_advanced_ballistics being used or not
-    // @todo, check ACE_AB is actually enabled
-    _windSpeed = if (isClass (configFile >> "CfgPatches" >> "ACE_Advanced_Ballistics")) then {
-        (eyePos ACE_player) call EFUNC(advanced_ballistics,calculateWindSpeed);
+    _windSpeed = if (missionNamespace getVariable [QEGVAR(advanced_ballistics,enabled), false]) then {
+        // With wind gradient
+        [eyePos ACE_player, true, true, true] call FUNC(calculateWindSpeed);
     } else {
-        vectorMagnitude ACE_wind;
+        // Without wind gradient
+        [eyePos ACE_player, false, true, true] call FUNC(calculateWindSpeed);
     };
     
     if (_windSpeed > 0.2) then {

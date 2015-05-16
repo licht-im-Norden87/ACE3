@@ -1,6 +1,6 @@
 #include "script_component.hpp"
 
-//#include "initKeybinds.sqf"
+#include "initKeybinds.sqf"
 
 GVAR(Menus) = ["Direction", "Wind SPD  m/s", "CROSSWIND m/s", "HEADWIND  m/s", "TEMP       °C", "HUMIDITY    %", "BARO      hPA", "ALTITUDE    m", "User Screen   1", "User Screen   2"];
 
@@ -23,3 +23,5 @@ GVAR(ImpellerState) = 0;
 
 GVAR(Kestrel4500) = false;
 GVAR(Overlay) = false;
+
+[] call FUNC(restoreUserData);
