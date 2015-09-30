@@ -44,12 +44,12 @@ _energyIncrement = 0.75 * 0.0005 * _bulletMass * (vectorMagnitudeSqr _velocity);
 _barrelMass = 0.50 * (getNumber (configFile >> "CfgWeapons" >> _weapon >> "WeaponSlotsInfo" >> "mass") / 22.0) max 1.0;
 
 // Calculate cooling
-_temperature = [_temperature, _barrelMass, time - _time] call FUNC(cooldown);
+_temperature = [_temperature, _barrelMass, ACE_time - _time] call FUNC(cooldown);
 // Calculate heating
 _temperature = _temperature + _energyIncrement / (_barrelMass * 466); // Steel Heat Capacity = 466 J/(Kg.K)
 
 // set updated values
-_time = time;
+_time = ACE_time;
 _unit setVariable [_variableName, [_temperature, _time], false];
 _scaledTemperature = (_temperature / 1000) min 1 max 0;
 
@@ -164,8 +164,6 @@ if (stance _unit == "PRONE") then {
 if ("Jam" in (missionNamespace getvariable ["ACE_Debug", []])) then {
   _jamChance = 0.5;
 };
-
-["Overheating", [_temperature, _jamChance], {format ["Temperature: %1 - JamChance: %2", _this select 0, _this select 1]}] call EFUNC(common,log);
 
 if (random 1 < _jamChance) then {
   [_unit, _weapon] call FUNC(jamWeapon);

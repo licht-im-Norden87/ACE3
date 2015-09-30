@@ -17,9 +17,9 @@
 
 private ["_menuInSelectedPath", "_path", "_menuDepth", "_x", "_offset", "_newPos", "_forEachIndex", "_player", "_pos", "_target", "_textSettings"];
 
-EXPLODE_4_PVT(_this,_parentPath,_action,_sPos,_angles);
-EXPLODE_3_PVT(_action,_actionData,_activeChildren,_actionObject);
-EXPLODE_2_PVT(_angles,_centerAngle,_maxAngleSpan);
+params ["_parentPath", "_action", "_sPos", "_angles"];
+_action params ["_actionData", "_activeChildren", "_actionObject"];
+_angles params ["_centerAngle", "_maxAngleSpan"];
 
 _menuDepth = (count GVAR(menuDepthPath));
 
@@ -102,8 +102,8 @@ if (GVAR(UseListMenu)) then {
 
 // Animate menu scale
 if (_menuInSelectedPath && (_menuDepth == count _path)) then {
-    _scaleX = _scaleX * (0.3 + 0.7 * (((diag_tickTime - GVAR(expandedTime)) * 8) min 1));
-    _scaleY = _scaleY * (0.3 + 0.7 * (((diag_tickTime - GVAR(expandedTime)) * 8) min 1));
+    _scaleX = _scaleX * (0.3 + 0.7 * (((ACE_diagTime - GVAR(expandedTime)) * 8) min 1));
+    _scaleY = _scaleY * (0.3 + 0.7 * (((ACE_diagTime - GVAR(expandedTime)) * 8) min 1));
 };
 
 _target = _actionObject;

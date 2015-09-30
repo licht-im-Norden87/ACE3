@@ -40,6 +40,7 @@ PREP(handleDamage_caching);
 PREP(handleDamage_fractures);
 PREP(handleDamage_internalInjuries);
 PREP(handleDamage_wounds);
+PREP(handleDamage_woundsOld);
 PREP(handleUnitVitals);
 PREP(handleKilled);
 PREP(handleLocal);
@@ -55,6 +56,7 @@ PREP(isInMedicalFacility);
 PREP(isInMedicalVehicle);
 PREP(isMedic);
 PREP(isMedicalVehicle);
+PREP(isInStableCondition);
 PREP(itemCheck);
 PREP(modifyMedicalAction);
 PREP(onMedicationUsage);
@@ -66,6 +68,7 @@ PREP(selectionNameToNumber);
 PREP(setCardiacArrest);
 PREP(setDead);
 PREP(setHitPointDamage);
+PREP(setStructuralDamage);
 PREP(setUnconscious);
 PREP(treatment);
 PREP(treatment_failure);
@@ -76,9 +79,12 @@ PREP(treatmentAdvanced_CPR);
 PREP(treatmentAdvanced_CPRLocal);
 PREP(treatmentAdvanced_fullHeal);
 PREP(treatmentAdvanced_fullHealLocal);
+PREP(treatmentAdvanced_fullHealTreatmentTime);
 PREP(treatmentAdvanced_medication);
 PREP(treatmentAdvanced_medicationLocal);
+PREP(treatmentAdvanced_surgicalKit_onProgress);
 PREP(treatmentBasic_bandage);
+PREP(treatmentBasic_bandageLocal);
 PREP(treatmentBasic_bloodbag);
 PREP(treatmentBasic_bloodbagLocal);
 PREP(treatmentBasic_epipen);
@@ -109,6 +115,8 @@ PREP(handleCreateLitter);
 
 GVAR(injuredUnitCollection) = [];
 GVAR(IVBags) = [];
+
+DFUNC(handleDamage_assignWounds) = if ("ace_medical" callExtension "version" == "") then { DFUNC(handleDamage_woundsOld) } else { DFUNC(handleDamage_wounds)};
 
 call FUNC(parseConfigForInjuries);
 
