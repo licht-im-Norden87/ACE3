@@ -105,6 +105,7 @@
         </Key>
         <Key ID="STR_ACE_Slideshow_Duration_DisplayName">
             <English>Slide Duration</English>
+            <German>Anzeigedauer pro Bild</German>
             <French>Durée d'une diapositive</French>
             <Polish>Czas trwania slajdów</Polish>
             <Hungarian>Dia időtartam</Hungarian>
@@ -115,6 +116,7 @@
         </Key>
         <Key ID="STR_ACE_Slideshow_Duration_Description">
             <English>Duration of each slide. Default: 0 (Automatic Transitions Disabled)</English>
+            <German>Anzeigedauer pro Bild. Standard: 0 (Autovorführung deaktiviert)</German>
             <French>Durée de chaque diapositive. Dafaut: 0 (transition automatique désactivée)</French>
             <Polish>Czas trwania poszczególnych slajdów. Domyślnie: 0 (Automatyczne przejścia wyłączone)</Polish>
             <Hungarian>A diák időtartama. Alapértelmezett: 0 (Automatikus váltás letiltva)</Hungarian>
@@ -124,6 +126,7 @@
         </Key>
         <Key ID="STR_ACE_Slideshow_Interaction">
             <English>Slides</English>
+            <German>Bilder</German>
             <French>Diapositives</French>
             <Polish>Slajdy</Polish>
             <Hungarian>Diák</Hungarian>
