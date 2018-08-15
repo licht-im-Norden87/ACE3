@@ -1,9 +1,15 @@
+
+class Extended_PreStart_EventHandlers {
+    class ADDON {
+        init = QUOTE(call COMPILE_FILE(XEH_preStart));
+    };
+};
+
 class Extended_PreInit_EventHandlers {
     class ADDON {
         init = QUOTE(call COMPILE_FILE(XEH_preInit));
     };
 };
-
 
 class Extended_Init_EventHandlers {
     class GVAR(defaultCarriedObject) { // TODO check if we need to add all subclasses
@@ -22,7 +28,7 @@ class Extended_PostInit_EventHandlers {
 class Extended_Respawn_EventHandlers {
     class CAManBase {
         class ADDON {
-            respawn = QUOTE(call COMPILE_FILE(XEH_respawn));
+            respawn = QUOTE(call FUNC(handleRespawn));
         };
     };
 };

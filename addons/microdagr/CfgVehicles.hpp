@@ -8,21 +8,21 @@ class CfgVehicles {
                     displayName = CSTRING(configure);
                     condition = QUOTE(([DISPLAY_MODE_DIALOG] call FUNC(canShow)) && {GVAR(currentShowMode) != DISPLAY_MODE_DIALOG});
                     statement = QUOTE([DISPLAY_MODE_DIALOG] call FUNC(openDisplay));
-                    icon = QUOTE(PATHTOF(UI\icon_microDAGR.paa));
+                    icon = QPATHTOF(UI\icon_microDAGR.paa);
                     exceptions[] = {"notOnMap", "isNotInside", "isNotSitting"};
                     class GVAR(show) {
                         //Opens the mini map
                         displayName = CSTRING(show);
                         condition = QUOTE(([DISPLAY_MODE_DISPLAY] call FUNC(canShow)) && {GVAR(currentShowMode) != DISPLAY_MODE_DISPLAY});
                         statement = QUOTE([DISPLAY_MODE_DISPLAY] call FUNC(openDisplay));
-                        icon = QUOTE(PATHTOF(UI\icon_microDAGR.paa));
+                        icon = QPATHTOF(UI\icon_microDAGR.paa);
                         exceptions[] = {"notOnMap", "isNotInside", "isNotSitting"};
                     };
                     class GVAR(close) {
                         displayName = CSTRING(closeUnit);
                         condition = QUOTE(GVAR(currentShowMode) != DISPLAY_MODE_CLOSED);
                         statement = QUOTE([DISPLAY_MODE_CLOSED] call FUNC(openDisplay));
-                        icon = QUOTE(PATHTOF(UI\icon_microDAGR.paa));
+                        icon = QPATHTOF(UI\icon_microDAGR.paa);
                         exceptions[] = {"notOnMap", "isNotInside", "isNotSitting"};
                     };
                 };
@@ -36,10 +36,10 @@ class CfgVehicles {
         category = "ACE";
         displayName = CSTRING(Module_DisplayName);
         function = QFUNC(moduleMapFill);
-        scope = 2;
-        isGlobal = 0;
+        scope = 1;
+        isGlobal = 1;
         isSingular = 1;
-        icon = QUOTE(PATHTOF(UI\Icon_Module_microDAGR_ca.paa));
+        icon = QPATHTOF(UI\Icon_Module_microDAGR_ca.paa);
         functionPriority = 0;
         class Arguments {
             class MapDataAvailable {
@@ -72,7 +72,7 @@ class CfgVehicles {
         displayName = CSTRING(itemName);
         author = ECSTRING(common,ACETeam);
         vehicleClass = "Items";
-        icon = QUOTE(PATHTOF(UI\icon_microDAGR.paa));
+        icon = QPATHTOF(UI\icon_microDAGR.paa);
         class TransportItems {
             MACRO_ADDITEM(ACE_microDAGR,1);
         };

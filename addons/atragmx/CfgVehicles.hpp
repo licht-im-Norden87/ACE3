@@ -8,8 +8,7 @@ class CfgVehicles {
                     condition = QUOTE(call FUNC(can_show));
                     statement = QUOTE(call FUNC(create_dialog));
                     showDisabled = 0;
-                    priority = 2;
-                    icon = PATHTOF(UI\ATRAG_Icon.paa);
+                    icon = QPATHTOF(UI\ATRAG_Icon.paa);
                     exceptions[] = {"notOnMap", "isNotInside", "isNotSitting"};
                 };
             };

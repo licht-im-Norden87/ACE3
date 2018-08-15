@@ -2,15 +2,18 @@
  * Author: NouberNou and esteldunedain
  * Compile the self action menu from config for an object's class
  *
- * Argument:
+ * Arguments:
  * 0: Object or class name <OBJECT> or <STRING>
  *
- * Return value:
+ * Return Value:
  * None
+ *
+ * Example:
+ * [bob] call ACE_interact_menu_fnc_compileMenuSelfAction
  *
  * Public: No
  */
-#include "script_component.hpp";
+#include "script_component.hpp"
 
 params ["_target"];
 
@@ -18,10 +21,10 @@ private _objectType = _target;
 if (_target isEqualType objNull) then {
     _objectType = typeOf _target;
 };
-private _actionsVarName = format [QGVAR(SelfAct_%1), _objectType];
+private _namespace = GVAR(ActSelfNamespace);
 
 // Exit if the action menu is already compiled for this class
-if !(isNil {missionNamespace getVariable [_actionsVarName, nil]}) exitWith {};
+if !(isNil {_namespace getVariable _objectType}) exitWith {};
 
 
 private _recurseFnc = {
@@ -34,7 +37,11 @@ private _recurseFnc = {
         if(isClass _entryCfg) then {
             private _displayName = getText (_entryCfg >> "displayName");
 
-            private _icon = getText (_entryCfg >> "icon");
+            private _icon = if (isArray (_entryCfg >> "icon")) then {
+                getArray (_entryCfg >> "icon");
+            } else {
+                [getText (_entryCfg >> "icon"), "#FFFFFF"];
+            };
             private _statement = compile (getText (_entryCfg >> "statement"));
 
             private _condition = getText (_entryCfg >> "condition");
@@ -114,7 +121,7 @@ private _actions = [
                     // Dummy statement so it's not collapsed when there's no available actions
                     true
                 },
-                {[ACE_player, _target, ["isNotInside","isNotDragging", "isNotCarrying", "isNotSwimming", "notOnMap", "isNotEscorting", "isNotSurrendering", "isNotSitting", "isNotOnLadder"]] call EFUNC(common,canInteractWith)},
+                {[ACE_player, _target, ["isNotInside","isNotDragging", "isNotCarrying", "isNotSwimming", "notOnMap", "isNotEscorting", "isNotSurrendering", "isNotSitting", "isNotOnLadder", "isNotRefueling"]] call EFUNC(common,canInteractWith)},
                 {},
                 {},
                 "Spine3",
@@ -125,4 +132,4 @@ private _actions = [
         ]
     ];
 
-missionNamespace setVariable [_actionsVarName, _actions];
+_namespace setVariable [_objectType, _actions];

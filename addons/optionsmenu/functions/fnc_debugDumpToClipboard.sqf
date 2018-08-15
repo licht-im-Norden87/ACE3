@@ -15,27 +15,33 @@
  */
 #include "script_component.hpp"
 
-private ["_var", "_unit", "_outputText", "_text"];
+#define MIN_ARRAY_SIZE 50
 
-#define MIN_ARRAY_SIZE 10
-
-_outputText = {
+private _outputText = {
     diag_log text (_this select 0);
     "ace_clipboard" callExtension ((_this select 0) + "
 ");
 };
 
-_text = format ["~~~~~~~~~ACE Debug~~~~~~~~~
+private _text = format ["~~~~~~~~~ACE Debug~~~~~~~~~
 time = %1
 
 ------Performance------
 diag_fps = %2
-count ace_common_waitAndExecArray = %3
-count cba_common_perFrameHandlerArray = %4 (max %5)
-count diag_activeSQFScripts = %6
-count diag_activeSQSScripts = %7
-count diag_activeMissionFSMs = %8",
-time, diag_fps, count ace_common_waitAndExecArray, {!isNil "_x"} count cba_common_perFrameHandlerArray, count cba_common_perFrameHandlerArray, count diag_activeSQFScripts, count diag_activeSQSScripts,count diag_activeMissionFSMs];
+count cba_common_waitAndExecArray = %3
+count cba_common_waitUntilAndExecArray = %4
+count cba_common_perFrameHandlerArray = %5 (max %6)
+count diag_activeSQFScripts = %7
+count diag_activeSQSScripts = %8
+count diag_activeMissionFSMs = %9",
+time,
+diag_fps,
+count cba_common_waitAndExecArray,
+count cba_common_waitUntilAndExecArray,
+{!isNil "_x"} count cba_common_perFrameHandlerArray, count cba_common_perFrameHandlerArray,
+count diag_activeSQFScripts,
+count diag_activeSQSScripts,
+count diag_activeMissionFSMs];
 [_text] call _outputText;
 
 
@@ -49,15 +55,16 @@ if (isNull ace_player) then {"null"} else {animationState ace_player}];
 
 
 _text = format ["
-------ACE Settings------"];
+------ACE's CBA Settings------"];
 [_text] call _outputText;
 
-
+private _aceSettings = cba_settings_allSettings select {((_x select [0,4]) == "ace_") || {(_x select [0,5]) == "acex_"}};
+_aceSettings sort true;
 {
-    _var = missionNamespace getVariable [(_x select 0), "ERROR: Not Defined"];
-    _text = format ["%1 - %2", (_x select 0), _var];
+    _var = missionNamespace getVariable [_x, "ERROR: Not Defined"];
+    _text = format ["%1 - %2", _x, _var];
     [_text] call _outputText;
-} forEach EGVAR(common,settings);
+} forEach _aceSettings;
 
 
 _text = format ["
@@ -74,9 +81,9 @@ _text = format ["
 } forEach (allVariables missionNamespace);
 
 {
-    _unit = _x;
+    private _unit = _x;
     {
-        _var = _unit getVariable [_x, nil];
+        private _var = _unit getVariable [_x, nil];
         if(!isnil "_var" && {_var isEqualType []} && {(count _var) > MIN_ARRAY_SIZE}) then {
             _text = format ["%1 on [%2] - ARRAY SIZE: %3", _x, _unit, (count _var)];
             [_text] call _outputText;

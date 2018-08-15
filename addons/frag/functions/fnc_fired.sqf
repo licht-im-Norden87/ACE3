@@ -1,15 +1,13 @@
 /*
  * Author: nou, jaynus, PabstMirror
- * Called from FiredBIS event on AllVehicles
+ * Called from the unified fired EH for all.
  * If spall is not enabled (default), then cache and only track those that will actually trigger fragmentation.
  *
  * Arguments:
- * 0: gun - Object the event handler is assigned to <OBJECT>
- * 4: type - Ammo used <STRING>
- * 6: round - Object of the projectile that was shot <OBJECT>
+ * None. Parameters inherited from EFUNC(common,firedEH)
  *
  * Return Value:
- * Nothing
+ * None
  *
  * Example:
  * [clientFiredBIS-XEH] call ace_frag_fnc_fired
@@ -19,38 +17,43 @@
 // #define DEBUG_ENABLED_FRAG
 #include "script_component.hpp"
 
-params ["_gun", "", "", "", "_type", "", "_round"];
+//IGNORE_PRIVATE_WARNING ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile", "_vehicle", "_gunner", "_turret"];
+TRACE_10("firedEH:",_unit, _weapon, _muzzle, _mode, _ammo, _magazine, _projectile, _vehicle, _gunner, _turret);
 
-private _shouldAdd = GVAR(cacheRoundsTypesToTrack) getVariable _type;
+private _shouldAdd = GVAR(cacheRoundsTypesToTrack) getVariable _ammo;
 if (isNil "_shouldAdd") then {
-    TRACE_1("no cache for round",_type);
-
-    if (!EGVAR(common,settingsInitFinished)) exitWith {
-        //Just incase fired event happens before settings init, don't want to set cache wrong if spall setting changes
-        TRACE_1("Settings not init yet - exit without setting cache",_type);
-        _shouldAdd = false;
-    };
-
-    if (GVAR(SpallEnabled)) exitWith {
-        //Always want to run whenever spall is enabled?
-        _shouldAdd = true;
-        TRACE_2("SettingCache[spallEnabled]",_type,_shouldAdd);
-        GVAR(cacheRoundsTypesToTrack) setVariable [_type, _shouldAdd];
-    };
+    TRACE_1("no cache for round",_ammo);
 
     //Read configs and test if it would actually cause a frag, using same logic as FUNC(pfhRound)
-    private _skip = getNumber (configFile >> "CfgAmmo" >> _type >> QGVAR(skip));
-    private _explosive = getNumber (configFile >> "CfgAmmo" >> _type >> "explosive");
-    private _indirectRange = getNumber (configFile >> "CfgAmmo" >> _type >> "indirectHitRange");
-    private _force = getNumber (configFile >> "CfgAmmo" >> _type >> QGVAR(force));
-    private _fragPower = getNumber(configFile >> "CfgAmmo" >> _type >> "indirecthit")*(sqrt((getNumber (configFile >> "CfgAmmo" >> _type >> "indirectHitRange"))));
+    private _skip = getNumber (configFile >> "CfgAmmo" >> _ammo >> QGVAR(skip));
+    private _explosive = getNumber (configFile >> "CfgAmmo" >> _ammo >> "explosive");
+    private _indirectRange = getNumber (configFile >> "CfgAmmo" >> _ammo >> "indirectHitRange");
+    private _force = getNumber (configFile >> "CfgAmmo" >> _ammo >> QGVAR(force));
+    private _fragPower = getNumber (configFile >> "CfgAmmo" >> _ammo >> "indirecthit") * (sqrt (getNumber (configFile >> "CfgAmmo" >> _ammo >> "indirectHitRange")));
 
     _shouldAdd = (_skip == 0) && {(_force == 1) || {_explosive > 0.5 && {_indirectRange >= 4.5} && {_fragPower >= 35}}};
-    TRACE_6("SettingCache[willFrag?]",_skip,_explosive,_indirectRange,_force,_fragPower,_shouldAdd);
-    GVAR(cacheRoundsTypesToTrack) setVariable [_type, _shouldAdd];
+
+    if (GVAR(spallEnabled) && {!_shouldAdd}) then {
+        private _caliber = getNumber (configFile >> "CfgAmmo" >> _ammo >> "caliber");
+        if !(_caliber >= 2.5 || {(_explosive > 0 && {_indirectRange >= 1})}) exitWith {}; // from check in doSpall: line 34
+        TRACE_1("Won't frag, but will spall",_caliber);
+        _shouldAdd = true;
+    };
+
+    TRACE_6("Setting Cache",_skip,_explosive,_indirectRange,_force,_fragPower,_shouldAdd);
+    GVAR(cacheRoundsTypesToTrack) setVariable [_ammo, _shouldAdd];
 };
 
 if (_shouldAdd) then {
-    TRACE_3("Running Frag Tracking",_gun,_type,_round);
-    [_gun, _type, _round] call FUNC(addPfhRound);
+    // firedMan will have nil "_gunner", so just check _unit; for firedVehicle we want to check _gunner
+    private _localShooter = if (isNil "_gunner") then {local _unit} else {local _gunner};
+    TRACE_4("",_localShooter,_unit,_ammo,_projectile);
+    if (!_localShooter) exitWith {};
+    if (_weapon == "Put") exitWith {}; // Ignore explosives placed without ace_explosives
+
+    // Skip if less than 0.5 second from last shot
+    if ((CBA_missionTime - (_unit getVariable [QGVAR(lastTrack), -1])) < 0.5) exitWith {};
+    _unit setVariable [QGVAR(lastTrack), CBA_missionTime];
+
+    [_unit, _ammo, _projectile] call FUNC(addPfhRound);
 };

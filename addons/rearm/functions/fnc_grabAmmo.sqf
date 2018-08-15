@@ -18,19 +18,19 @@
 
 params ["_dummy", "_unit"];
 
-REARM_HOLSTER_WEAPON
-[_unit, "forceWalk", QGVAR(vehRearm), true] call EFUNC(common,statusEffect_set);
+REARM_HOLSTER_WEAPON;
+[_unit, "forceWalk", "ACE_rearm", true] call EFUNC(common,statusEffect_set);
+[_unit, "blockThrow", "ACE_rearm", true] call EFUNC(common,statusEffect_set);
 
 [
-    5,
+    TIME_PROGRESSBAR(5),
     [_dummy, _unit],
     {
-        private ["_actionID"];
         params ["_args"];
         _args params ["_dummy", "_unit"];
         [_dummy, _unit] call FUNC(pickUpAmmo);
 
-        _actionID = _unit getVariable [QGVAR(ReleaseActionID), -1];
+        private _actionID = _unit getVariable [QGVAR(ReleaseActionID), -1];
         if (_actionID != -1) then {
             _unit removeAction _actionID;
         };

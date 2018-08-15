@@ -8,7 +8,7 @@ if (!hasInterface) exitWith {};
     // Conditions: canInteract
     if !([ACE_player, ACE_player, ["isNotInside", "isNotEscorting"]] call EFUNC(common,canInteractWith)) exitWith {false};
     // Conditions: specific
-    if !([ACE_player] call EFUNC(common,canUseWeapon)) exitWith {false};
+    if !([ACE_player] call CBA_fnc_canUseWeapon) exitWith {false};
 
     // Statement
     [ACE_player, handgunWeapon ACE_player] call FUNC(selectWeaponMode);
@@ -21,7 +21,7 @@ if (!hasInterface) exitWith {};
     // Conditions: canInteract
     if !([ACE_player, ACE_player, ["isNotInside", "isNotEscorting"]] call EFUNC(common,canInteractWith)) exitWith {false};
     // Conditions: specific
-    if !([ACE_player] call EFUNC(common,canUseWeapon)) exitWith {false};
+    if !([ACE_player] call CBA_fnc_canUseWeapon) exitWith {false};
 
     // Statement
     [ACE_player, primaryWeapon ACE_player] call FUNC(selectWeaponMode);
@@ -34,7 +34,7 @@ if (!hasInterface) exitWith {};
     // Conditions: canInteract
     if !([ACE_player, ACE_player, ["isNotInside", "isNotEscorting"]] call EFUNC(common,canInteractWith)) exitWith {false};
     // Conditions: specific
-    if !([ACE_player] call EFUNC(common,canUseWeapon)) exitWith {false};
+    if !([ACE_player] call CBA_fnc_canUseWeapon) exitWith {false};
 
     // Statement
     [ACE_player, primaryWeapon ACE_player] call FUNC(selectWeaponMuzzle);
@@ -47,7 +47,7 @@ if (!hasInterface) exitWith {};
     // Conditions: canInteract
     if !([ACE_player, ACE_player, ["isNotInside", "isNotEscorting"]] call EFUNC(common,canInteractWith)) exitWith {false};
     // Conditions: specific
-    if !([ACE_player] call EFUNC(common,canUseWeapon)) exitWith {false};
+    if !([ACE_player] call CBA_fnc_canUseWeapon) exitWith {false};
 
     // Statement
     [ACE_player, secondaryWeapon ACE_player] call FUNC(selectWeaponMode);
@@ -60,7 +60,7 @@ if (!hasInterface) exitWith {};
     // Conditions: canInteract
     if !([ACE_player, ACE_player, ["isNotInside", "isNotEscorting"]] call EFUNC(common,canInteractWith)) exitWith {false};
     // Conditions: specific
-    if !([ACE_player] call EFUNC(common,canUseWeapon)) exitWith {false};
+    if !([ACE_player] call CBA_fnc_canUseWeapon) exitWith {false};
 
     // Statement
     [ACE_player, binocular ACE_player] call FUNC(selectWeaponMode);
@@ -72,8 +72,8 @@ if (!hasInterface) exitWith {};
 ["ACE3 Weapons", QGVAR(SelectGrenadeFrag), localize LSTRING(SelectGrenadeFrag), {
     // Conditions: canInteract
     if !([ACE_player, ACE_player, ["isNotInside", "isNotEscorting"]] call EFUNC(common,canInteractWith)) exitWith {false};
-    // Conditions: specific
-    if !([ACE_player] call EFUNC(common,canUseWeapon)) exitWith {false};
+    // Don't change mode or show hint if advanced throwing is active
+    if (ACE_player getVariable [QEGVAR(advanced_throwing,inHand), false]) exitWith {false};
 
     // Statement
     [ACE_player, 1] call FUNC(selectNextGrenade);
@@ -85,8 +85,8 @@ if (!hasInterface) exitWith {};
 ["ACE3 Weapons", QGVAR(SelectGrenadeOther), localize LSTRING(SelectGrenadeOther), {
     // Conditions: canInteract
     if !([ACE_player, ACE_player, ["isNotInside", "isNotEscorting"]] call EFUNC(common,canInteractWith)) exitWith {false};
-    // Conditions: specific
-    if !([ACE_player] call EFUNC(common,canUseWeapon)) exitWith {false};
+    // Don't change mode or show hint if advanced throwing is active
+    if (ACE_player getVariable [QEGVAR(advanced_throwing,inHand), false]) exitWith {false};
 
     // Statement
     [ACE_player, 2] call FUNC(selectNextGrenade);
@@ -99,7 +99,7 @@ if (!hasInterface) exitWith {};
     // Conditions: canInteract
     if !([ACE_player, ACE_player, ["isNotInside", "isNotEscorting"]] call EFUNC(common,canInteractWith)) exitWith {false};
     // Conditions: specific
-    if !([ACE_player] call EFUNC(common,canUseWeapon)) exitWith {false};
+    if !([ACE_player] call CBA_fnc_canUseWeapon) exitWith {false};
 
     // Statement
     if ((currentWeapon ACE_player) != "") then {
@@ -195,3 +195,19 @@ if (!hasInterface) exitWith {};
 },
 {false},
 [10, [false, false, false]], false] call CBA_fnc_addKeybind; //9 Key
+
+["ACE3 Vehicles", QGVAR(CollisionLights), localize LSTRING(CollisionLights), {
+    // Conditions: canInteract
+    if (!([ACE_player, vehicle ACE_player, []] call EFUNC(common,canInteractWith))) exitWith {false};
+    // Conditions: specific
+    if ((ACE_player isEqualTo (vehicle ACE_player)) || {ACE_player != (driver (vehicle ACE_player))}) exitWith {false};
+    
+    // Statement
+    (vehicle ACE_player) setCollisionLight !(isCollisionLightOn (vehicle ACE_player));
+    true
+},
+{false},
+[0, [false, false, false]]] call CBA_fnc_addKeybind;
+
+// Register fire event handler
+["ace_firedPlayer", DFUNC(throwGrenade)] call CBA_fnc_addEventHandler;

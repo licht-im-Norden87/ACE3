@@ -4,7 +4,7 @@
  *
  * Arguments:
  * 0: Unit <OBJECT>
- * 1: Fuel Truck <OBJECT>
+ * 1: Fuel Source <OBJECT>
  *
  * Return Value:
  * None
@@ -16,25 +16,25 @@
  */
 #include "script_component.hpp"
 
-params [["_unit", objNull, [objNull]], ["_target", objNull, [objNull]]];
+params [["_unit", objNull, [objNull]], ["_source", objNull, [objNull]]];
 
-private _fuel = [_target] call FUNC(getFuel);
+private _fuel = [_source] call FUNC(getFuel);
 
 [
-    5,
-    [_unit, _target, _fuel],
+    TIME_PROGRESSBAR(REFUEL_PROGRESS_DURATION * 2),
+    [_unit, _source, _fuel],
     {
         params ["_args"];
-        _args params [["_unit", objNull, [objNull]], ["_target", objNull, [objNull]], ["_fuel", 0, [0]]];
+        _args params [["_unit", objNull, [objNull]], ["_source", objNull, [objNull]], ["_fuel", 0, [0]]];
         if (_fuel > 0 ) then {
-            ["displayTextStructured", [_unit], [[LSTRING(Hint_RemainingFuel), _fuel], 2, _unit]] call EFUNC(common,targetEvent);
+            [QEGVAR(common,displayTextStructured), [[LSTRING(Hint_RemainingFuel), _fuel], 2, _unit], _unit] call CBA_fnc_targetEvent;
         } else {
-            ["displayTextStructured", [_unit], [LSTRING(Hint_Empty), 2, _unit]] call EFUNC(common,targetEvent);
+            [QEGVAR(common,displayTextStructured), [LSTRING(Hint_Empty), 2, _unit], _unit] call CBA_fnc_targetEvent;
         };
         true
     },
     {true},
     localize LSTRING(CheckFuelAction),
     {true},
-    ["isnotinside"]
+    [INTERACT_EXCEPTIONS]
 ] call EFUNC(common,progressBar);

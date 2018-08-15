@@ -1,18 +1,11 @@
-class RscControlsGroup;
-class VScrollbar;
-class HScrollbar;
-class RscText;
-class RscMapControl;
-
 class RscInGameUI {
     class RscOptics_LaserDesignator {
         idd = 300;
         controls[] = {"CA_IGUI_elements_group"};
-        
+
         onLoad = "uiNameSpace setVariable ['ACE_RscOptics_LaserDesignator',(_this select 0)];";
         onUnload = "uiNameSpace setVariable ['ACE_RscOptics_LaserDesignator',nil];";
-        
-        
+
         class CA_IGUI_elements_group: RscControlsGroup {
             idc = 170;
 
@@ -118,7 +111,7 @@ class RscInGameUI {
                     w = "3.5 *         (0.01875 * SafezoneH)";
                     h = "1.6 *         (0.025 * SafezoneH)";
                 };
-                
+
                 class ACE_LaserCode_Helper : RscMapControl {
                     idc = -1;
                     onDraw = QUOTE(_this call FUNC(onLaserDesignatorDraw));

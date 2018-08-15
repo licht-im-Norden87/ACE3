@@ -9,23 +9,17 @@ class CfgVehicles {
         };
     };
 
-     class Man;
-     class CAManBase: Man {
-         class ACE_SelfActions {
-             class ACE_CutParachute {
-                 displayName = CSTRING(CutParachute);
-                 exceptions[] = {"isNotInside"};
-                 condition = QUOTE([_player] call FUNC(checkCutParachute));
-                 statement = QUOTE([_player] call FUNC(cutParachute));
-                 showDisabled = 0;
-                 priority = 2.9;
-                 icon = QUOTE(PATHTOF(UI\cut_ca.paa));
-             };
-         };
-     };
-
     class Helicopter;
     class ParachuteBase: Helicopter {
+        class ACE_SelfActions {
+            class ACE_CutParachute {
+                displayName = CSTRING(CutParachute);
+                condition = QUOTE(_target getVariable [ARR_2(QQGVAR(canCut),false)]);
+                statement = QUOTE([ARR_2(_player,_target)] call FUNC(cutParachute));
+                showDisabled = 0;
+                icon = QPATHTOF(UI\cut_ca.paa);
+            };
+        };
         MACRO_HASRESERVE
     };
     class ParachuteWest: ParachuteBase {
@@ -43,13 +37,13 @@ class CfgVehicles {
     class NonSteerable_Parachute_F: Parachute {
         MACRO_HASRESERVE
     };
-    class Paraglide: ParachuteWest{
+    class Paraglide: ParachuteWest {
         MACRO_HASRESERVE
     };
-    class Steerable_Parachute_F: Paraglide{
+    class Steerable_Parachute_F: Paraglide {
         MACRO_HASRESERVE
     };
-    class Parachute_02_base_F: parachuteBase {
+    class Parachute_02_base_F: ParachuteBase {
         MACRO_HASRESERVE
     };
     class B_Parachute_02_F: Parachute_02_base_F {
@@ -83,7 +77,8 @@ class CfgVehicles {
         //model = "\A3\Weapons_F\Ammoboxes\Bags\Backpack_Parachute";    // @todo
         // backpackSimulation = "ParachuteNonSteerable";    //ParachuteSteerable  //Bis broke this in 1.40
         ParachuteClass = "NonSteerable_Parachute_F";
-        MACRO_HASRESERVE
+        ace_hasReserveParachute = 1;
+        ace_reserveParachute = "ACE_NonSteerableReserveParachute";
         maximumLoad = 0;
         mass = 100;
     };
@@ -93,9 +88,13 @@ class CfgVehicles {
         displayName = CSTRING(ReserveParachute);
         scope = 1;
         mass = 70;
-        ParachuteClass = "NonSteerable_Parachute_F";
+        ParachuteClass = "Steerable_Parachute_F";
         ace_reserveParachute = "";
         ace_hasReserveParachute = 0;
+    };
+
+    class ACE_NonSteerableReserveParachute: ACE_ReserveParachute {
+        ParachuteClass = "NonSteerable_Parachute_F";
     };
 
     class B_Soldier_05_f; class B_Pilot_F: B_Soldier_05_f {backpack = "ACE_NonSteerableParachute";};

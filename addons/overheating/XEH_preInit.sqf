@@ -2,17 +2,8 @@
 
 ADDON = false;
 
-PREP(checkTemperature);
-PREP(clearJam);
-PREP(displayTemperature);
-PREP(firedEH);
-PREP(getWeaponData);
-PREP(handleTakeEH);
-PREP(jamWeapon);
-PREP(overheat);
-PREP(swapBarrel);
-PREP(swapBarrelCallback);
-PREP(updateTemperature);
-PREP(updateTemperatureThread);
+PREP_RECOMPILE_START;
+#include "XEH_PREP.hpp"
+PREP_RECOMPILE_END;
 
 ADDON = true;

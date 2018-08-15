@@ -8,7 +8,10 @@
  * 2: Exceptions. What general conditions are to skip? (default: []) <ARRAY>
  *
  * Return Value:
- * Unit can interact?
+ * Unit can interact? <BOOL>
+ *
+ * Example:
+ * [bob, target, []] call ace_common_fnc_canInteractWith
  *
  * Public: Yes
  */
@@ -16,7 +19,7 @@
 
 params ["_unit", "_target", ["_exceptions", []]];
 
-_exceptions = [_exceptions, {toLower _this}] call FUNC(map);
+_exceptions = _exceptions apply {toLower _x};
 
 private _owner = _target getVariable [QGVAR(owner), objNull];
 

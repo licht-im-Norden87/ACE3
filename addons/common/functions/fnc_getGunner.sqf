@@ -9,6 +9,9 @@
  * Return Value:
  * Gunner <OBJECT>
  *
+ * Example:
+ * [car, "gun"] call ace_common_fnc_getGunner
+ *
  * Public: Yes
  */
 #include "script_component.hpp"
@@ -30,7 +33,7 @@ private _gunner = objNull;
 
 // ensure that at least the pilot is returned if there is no gunner
 if (isManualFire _vehicle && {isNull _gunner}) then {
-    _gunner = driver _vehicle;
+    _gunner = effectiveCommander _vehicle;
 };
 
 _gunner

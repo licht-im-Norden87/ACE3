@@ -26,7 +26,7 @@ if (_weight > missionNamespace getVariable ["ACE_maxWeightCarry", 1E11]) exitWit
     [localize LSTRING(UnableToDrag)] call EFUNC(common,displayTextStructured);
 };
 
-private _timer = ACE_time + 5;
+private _timer = CBA_missionTime + 5;
 
 // handle objects vs persons
 if (_target isKindOf "CAManBase") then {
@@ -46,17 +46,19 @@ if (_target isKindOf "CAManBase") then {
     [_unit, "AcinPknlMstpSnonWnonDnon_AcinPercMrunSnonWnonDnon", 2, true] call EFUNC(common,doAnimation);
     [_target, "AinjPfalMstpSnonWrflDnon_carried_Up", 2, true] call EFUNC(common,doAnimation);
 
-    _timer = ACE_time + 15;
+    _timer = CBA_missionTime + 15;
 
 } else {
 
     // select no weapon and stop sprinting
-    _unit action ["SwitchWeapon", _unit, _unit, 99];
+    _unit action ["SwitchWeapon", _unit, _unit, 299];
     [_unit, "AmovPercMstpSnonWnonDnon", 0] call EFUNC(common,doAnimation);
 
     [_unit, "forceWalk", "ACE_dragging", true] call EFUNC(common,statusEffect_set);
 
 };
+
+[_unit, "blockThrow", "ACE_dragging", true] call EFUNC(common,statusEffect_set);
 
 // prevent multiple players from accessing the same object
 [_unit, _target, true] call EFUNC(common,claim);

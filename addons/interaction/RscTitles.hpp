@@ -8,10 +8,9 @@ class ACE_Interaction_Button_Base {
     action = "";
 
     idc = -1;
-    access = 0;
     type = 1;
     text = "";
-    font = "PuristaMedium";
+    font = "RobotoCondensed";
     sizeEx = "0.8 / 40 / (getResolution select 5)";
     shadow = 2;
 
@@ -156,6 +155,9 @@ class RscInteractionText: RscText{
     w = 24 * GUI_GRID_W;
     h = 1.5 * GUI_GRID_H;
 };
+class RscInteractionText_right: RscText{
+    style = 1; // right aligned text
+};
 
 class RscTitles {
     class GVAR(InteractionHelper) {
@@ -170,7 +172,7 @@ class RscTitles {
         class controls {
             class SelectIcon: RscInteractionHelperIcon{
                 idc = 1200;
-                text = PATHTOF(UI\mouse_left_ca.paa);
+                text = QPATHTOF(UI\mouse_left_ca.paa);
                 y = 17.5 * GUI_GRID_H;
             };
             class SelectText: RscInteractionText{
@@ -180,7 +182,7 @@ class RscTitles {
             };
             class GoBackIcon: RscInteractionHelperIcon{
                 idc = 1201;
-                text = PATHTOF(UI\mouse_right_ca.paa);
+                text = QPATHTOF(UI\mouse_right_ca.paa);
                 y = 19.5 * GUI_GRID_H;
             };
             class GoBackText: RscInteractionText{
@@ -190,7 +192,7 @@ class RscTitles {
             };
             class ScrollIcon: RscInteractionHelperIcon{
                 idc = 1202;
-                text = PATHTOF(UI\mouse_scroll_ca.paa);
+                text = QPATHTOF(UI\mouse_scroll_ca.paa);
                 y = 18.5 * GUI_GRID_H;
             };
             class ScrollText: RscInteractionText{

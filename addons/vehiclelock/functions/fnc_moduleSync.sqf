@@ -25,11 +25,9 @@ TRACE_3("params",_logic,_syncedObjects,_activated);
 if !(_activated) exitWith {WARNING("Vehicle Lock Sync Module - placed but not active");};
 
 [{
-    private ["_listOfVehicles"];
-
     params ["_syncedObjects"];
 
-    _listOfVehicles = [];
+    private _listOfVehicles = [];
     {
         if ((_x isKindOf "Car") || (_x isKindOf "Tank") || (_x isKindOf "Helicopter")) then {
             _listOfVehicles pushBack _x;
@@ -41,8 +39,7 @@ if !(_activated) exitWith {WARNING("Vehicle Lock Sync Module - placed but not ac
     };
 
     {
-        private "_unit";
-        _unit = _x;
+        private _unit = _x;
         if (_unit isKindOf "CAManBase") then {
             {
                 [_unit, _x, true] call FUNC(addKeyForVehicle);
@@ -51,4 +48,4 @@ if !(_activated) exitWith {WARNING("Vehicle Lock Sync Module - placed but not ac
     } forEach _syncedObjects;
 
     //Wait to add keys until various gear assigns have finished (~5 seconds)
-}, [_syncedObjects], 5, 1] call EFUNC(common,waitAndExecute);
+}, [_syncedObjects], 5, 1] call CBA_fnc_waitAndExecute;

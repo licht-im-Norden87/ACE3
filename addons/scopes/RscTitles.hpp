@@ -1,5 +1,6 @@
 
 class RscText;
+class RscPicture;
 
 class RscTitles {
     class ACE_Scopes_Zeroing {
@@ -12,17 +13,15 @@ class RscTitles {
         fadein = 0;
         fadeout = 0;
         name = QGVAR(Zeroing);
-        class RscPicture;
-        class RscText;
         class controls {
             class ACE_Scopes_Zeroing_BG : RscPicture {
                 idc = 11;
                 type = 0;
-                text = PATHTOF(UI\scopes_bg.paa);
+                text = QPATHTOF(UI\scopes_bg.paa);
                 style = 48 + 0x800;
                 scale = 1;
                 sizeEx = 1;
-                font = "PuristaMedium";
+                font = "RobotoCondensed";
                 colorText[] = { 1, 1, 1, 1 };
                 colorBackground[] = { 1, 1, 1, 1 };
                 shadow = 1;
@@ -38,7 +37,7 @@ class RscTitles {
                 style = 2;
                 sizeEx = 0.04;
                 lineSpacing = 1;
-                font = "PuristaMedium";
+                font = "RobotoCondensed";
                 text = "";
                 colorText[] = { 1, 1, 1, 0.9 };
                 colorBackground[] = { 1, 0, 0, 0 };
@@ -52,10 +51,10 @@ class RscTitles {
             class ACE_Scopes_Zeroing_Horizontal : RscText {
                 idc = 13;
                 type = 0;
-                style = 0;
+                style = 2;
                 sizeEx = 0.04;
                 lineSpacing = 1;
-                font = "PuristaMedium";
+                font = "RobotoCondensed";
                 text = "";
                 colorText[] = { 1, 1, 1, 0.9 };
                 colorBackground[] = { 1, 0, 0, 0 };
@@ -63,19 +62,9 @@ class RscTitles {
 
                 x = (0.5 - 0.4 / 2 + 0.6*0.4) * safezoneW + safezoneX;
                 y = (0 + 0.47*0.3) * safezoneH + safezoneY;
-                w = 0.04 * safezoneW;
+                w = 0.019 * safezoneW;
                 h = 0.025 * safezoneH;
             };
         };
     };
 };
-
-/*
-class RscInGameUI {
-    class RscUnitInfo;
-    class RscWeaponZeroing : RscUnitInfo {
-        onLoad = QUOTE([ARR_4('onLoad',_this,'RscUnitInfo','IGUI')] call compile preprocessfilelinenumbers 'A3\ui_f\scripts\initDisplay.sqf'; uiNamespace setVariable [ARR_2('ACE_dlgWeaponZeroing', _this select 0)]; );
-        //onLoad = "[""onLoad"",_this,""RscUnitInfo"",'IGUI'] call compile preprocessfilelinenumbers ""A3\ui_f\scripts\initDisplay.sqf""; uiNamespace setVariable ['ACE_dlgWeaponZeroing', _this select 0];";
-    };
-};
-*/

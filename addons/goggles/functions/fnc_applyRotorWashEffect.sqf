@@ -15,9 +15,7 @@
  */
 #include "script_component.hpp"
 
-private ["_unit", "_fnc_underCover"];
-
-_unit = ACE_player;
+private _unit = ACE_player;
 
 if (!alive _unit) exitWith {};
 
@@ -33,10 +31,9 @@ if (GVAR(FrameEvent) select 0) exitWith {
 };
 
 // check if the unit is affected by rotor wash
-private ["_rotorWash", "_safe"];
 
-_rotorWash = GVAR(FrameEvent) select 1;
-_safe = false;
+private _rotorWash = GVAR(FrameEvent) select 1;
+private _safe = false;
 
 // no rotor wash? remove effects.
 if !(_rotorWash select 0) exitWith {
@@ -50,7 +47,7 @@ if !(_rotorWash select 0) exitWith {
             if (GVAR(DustHandler) == -1) then {
                 GVAR(PostProcessEyes) ppEffectEnable false;
             }
-        }, [], 2] call EFUNC(common,waitAndExecute);
+        }, [], 2] call CBA_fnc_waitAndExecute;
 
         [GVAR(DustHandler)] call CBA_fnc_removePerFrameHandler;
         GVAR(DustHandler) = -1;

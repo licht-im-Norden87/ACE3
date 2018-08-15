@@ -2,12 +2,14 @@
 
 class CfgPatches {
     class ADDON {
-        units[] = {"ACE_moduleAllowConfigExport"};
+        name = COMPONENT_NAME;
+        units[] = {};
         weapons[] = {};
         requiredVersion = REQUIRED_VERSION;
         requiredAddons[] = {"ace_common"};
-        author[] = {"Glowbal", "PabstMirror"};
-        authorUrl = "http://github.com/Glowbal";
+        author = ECSTRING(common,ACETeam);
+        authors[] = {"Glowbal", "PabstMirror"};
+        url = ECSTRING(main,URL);
         VERSION_CONFIG;
     };
 };
@@ -20,22 +22,19 @@ class CfgAddons {
     };
 };
 
-
 #include "CfgEventHandlers.hpp"
-#include "gui\define.hpp"
-#include "gui\settingsMenu.hpp"
-#include "gui\pauseMenu.hpp"
-
 #include "CfgVehicles.hpp"
 #include "ACE_Settings.hpp"
+
+#include "gui\mainMenu.hpp"
+#include "gui\pauseMenu.hpp"
 
 class ACE_Extensions {
     extensions[] += {"ace_clipboard"};
 };
 
-
 class CfgCommands {
     allowedHTMLLoadURIs[] += {
-        "http://ace3mod.com/version.html"
+        "https://ace3mod.com/version.html"
     };
 };

@@ -3,17 +3,10 @@
 ADDON = false;
 LOG(MSG_INIT);
 
-PREP(blueForceTrackingModule);
-PREP(blueForceTrackingUpdate);
-PREP(compileFlashlightMenu);
-PREP(determineMapLight);
-PREP(determineZoom);
-PREP(flashlightGlow);
-PREP(getUnitFlashlights);
-PREP(moduleMap);
-PREP(onDrawMap);
-PREP(simulateMapLight);
-PREP(switchFlashlight);
-PREP(updateMapEffects);
+PREP_RECOMPILE_START;
+#include "XEH_PREP.hpp"
+PREP_RECOMPILE_END;
+
+#include "initSettings.sqf"
 
 ADDON = true;

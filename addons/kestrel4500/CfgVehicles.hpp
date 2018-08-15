@@ -8,16 +8,14 @@ class CfgVehicles {
                     condition = QUOTE(call FUNC(canShow) && !GVAR(Kestrel4500));
                     statement = QUOTE(call FUNC(createKestrelDialog));
                     showDisabled = 0;
-                    priority = 0.1;
-                    icon = QUOTE(PATHTOF(UI\Kestrel4500_Icon.paa));
+                    icon = QPATHTOF(UI\Kestrel4500_Icon.paa);
                     exceptions[] = {"notOnMap", "isNotInside", "isNotSitting"};
                     class GVAR(show) {
                         displayName = CSTRING(ShowKestrel);
                         condition = QUOTE(call FUNC(canShow) && !GVAR(Overlay));
                         statement = QUOTE(call FUNC(displayKestrel));
                         showDisabled = 0;
-                        priority = 0.2;
-                        icon = QUOTE(PATHTOF(UI\Kestrel4500_Icon.paa));
+                        icon = QPATHTOF(UI\Kestrel4500_Icon.paa);
                         exceptions[] = {"notOnMap", "isNotInside", "isNotSitting"};
                     };
                     class GVAR(hide) {
@@ -25,8 +23,7 @@ class CfgVehicles {
                         condition = QUOTE(GVAR(Overlay));
                         statement = QUOTE(call FUNC(displayKestrel));
                         showDisabled = 0;
-                        priority = 0.3;
-                        icon = QUOTE(PATHTOF(UI\Kestrel4500_Icon.paa));
+                        icon = QPATHTOF(UI\Kestrel4500_Icon.paa);
                         exceptions[] = {"notOnMap", "isNotInside", "isNotSitting"};
                     };
                 };

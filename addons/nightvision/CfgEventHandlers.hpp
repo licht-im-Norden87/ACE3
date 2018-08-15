@@ -1,19 +1,22 @@
+class Extended_PreStart_EventHandlers {
+    class ADDON {
+        init = QUOTE(call COMPILE_FILE(XEH_preStart));
+    };
+};
 class Extended_PreInit_EventHandlers {
     class ADDON {
-        init = QUOTE(call COMPILE_FILE(XEH_preInit) );
+        init = QUOTE(call COMPILE_FILE(XEH_preInit));
     };
 };
-
 class Extended_PostInit_EventHandlers {
     class ADDON {
-        clientInit = QUOTE(call COMPILE_FILE(XEH_postInitClient) );
+        init = QUOTE(call COMPILE_FILE(XEH_postInit));
     };
 };
 
-class Extended_FiredBIS_EventHandlers {
-    class AllVehicles {
-        class ADDON {
-            clientFiredBIS = QUOTE( _this call FUNC(blending) );
-        };
+// In SP-Editor, opening escape menu will break nvg grain effect
+class Extended_DisplayLoad_EventHandlers {
+    class RscDisplayInterrupt {
+        GVAR(resetGrain) = QUOTE(if (GVAR(ppeffectGrain) > -1) then {ppEffectDestroy GVAR(ppeffectGrain);};);
     };
 };

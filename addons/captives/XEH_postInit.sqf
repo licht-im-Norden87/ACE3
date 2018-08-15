@@ -1,5 +1,12 @@
 #include "script_component.hpp"
+#include "\a3\editor_f\Data\Scripts\dikCodes.h"
 
+["ace_settingsInitialized", {
+    // Hold on a little bit longer to ensure anims will work
+    [{
+        GVAR(captivityEnabled) = true;
+    }, [], 0.05] call CBA_fnc_waitAndExecute;
+}] call CBA_fnc_addEventHandler;
 
 //Handles when someone starts escorting and then disconnects, leaving the captive attached
 //This is normaly handled by the PFEH in doEscortCaptive, but that won't be running if they DC
@@ -7,8 +14,7 @@
 if (isServer) then {
     addMissionEventHandler ["HandleDisconnect", {
         params ["_disconnectedPlayer"];
-        private "_escortedUnit";
-        _escortedUnit = _disconnectedPlayer getVariable [QGVAR(escortedUnit), objNull];
+        private _escortedUnit = _disconnectedPlayer getVariable [QGVAR(escortedUnit), objNull];
         if ((!isNull _escortedUnit) && {(attachedTo _escortedUnit) == _disconnectedPlayer}) then {
             detach _escortedUnit;
         };
@@ -18,19 +24,34 @@ if (isServer) then {
     }];
 };
 
-["zeusDisplayChanged",   {_this call FUNC(handleZeusDisplayChanged)}] call EFUNC(common,addEventHandler);
-["playerChanged", {_this call FUNC(handlePlayerChanged)}] call EFUNC(common,addEventhandler);
-["MoveInCaptive", {_this call FUNC(vehicleCaptiveMoveIn)}] call EFUNC(common,addEventHandler);
-["MoveOutCaptive", {_this call FUNC(vehicleCaptiveMoveOut)}] call EFUNC(common,addEventHandler);
+["unit", FUNC(handlePlayerChanged)] call CBA_fnc_addPlayerEventHandler;
+[QGVAR(moveInCaptive), FUNC(vehicleCaptiveMoveIn)] call CBA_fnc_addEventHandler;
+[QGVAR(moveOutCaptive), FUNC(vehicleCaptiveMoveOut)] call CBA_fnc_addEventHandler;
 
-["SetHandcuffed", {_this call FUNC(setHandcuffed)}] call EFUNC(common,addEventHandler);
-["SetSurrendered", {_this call FUNC(setSurrendered)}] call EFUNC(common,addEventHandler);
+[QGVAR(setHandcuffed), FUNC(setHandcuffed)] call CBA_fnc_addEventHandler;
+[QGVAR(setSurrendered), FUNC(setSurrendered)] call CBA_fnc_addEventHandler;
 
 //Medical Integration Events
-["medical_onUnconscious", {_this call ACE_Captives_fnc_handleOnUnconscious}] call EFUNC(common,addEventHandler);
+["ace_unconscious", FUNC(handleOnUnconscious)] call CBA_fnc_addEventHandler;
 
 if (!hasInterface) exitWith {};
 
-["isNotEscorting", {!(GETVAR(_this select 0,GVAR(isEscorting),false))}] call EFUNC(common,addCanInteractWithCondition);
-["isNotHandcuffed", {!(GETVAR(_this select 0,GVAR(isHandcuffed),false))}] call EFUNC(common,addCanInteractWithCondition);
-["isNotSurrendering", {!(GETVAR(_this select 0,GVAR(isSurrendering),false))}] call EFUNC(common,addCanInteractWithCondition);
+["ACE3 Common", QGVAR(captives), [(localize LSTRING(SetCaptive)), (localize LSTRING(KeyComb_description))],
+{
+    private _target = cursorObject;
+    if !([ACE_player, _target, []] call EFUNC(common,canInteractWith)) exitWith {false};
+    if !(_target isKindOf "CAManBase") exitWith {false};
+    if ((_target distance ACE_player) > getNumber (configFile >> "CfgVehicles" >> "CAManBase" >> "ACE_Actions" >> "ACE_ApplyHandcuffs" >> "distance")) exitWith {false};
+
+    if ([ACE_player, _target] call FUNC(canApplyHandcuffs)) exitWith {
+        [QGVAR(setHandcuffed), [_target, true], _target] call CBA_fnc_targetEvent;
+        true
+    };
+    false
+},
+{false},
+[DIK_F1, [true, false, false]], true] call CBA_fnc_addKeybind; // Shift + F1
+
+["isNotEscorting", {!GETVAR(_this select 0,GVAR(isEscorting),false)}] call EFUNC(common,addCanInteractWithCondition);
+["isNotHandcuffed", {!GETVAR(_this select 0,GVAR(isHandcuffed),false)}] call EFUNC(common,addCanInteractWithCondition);
+["isNotSurrendering", {!GETVAR(_this select 0,GVAR(isSurrendering),false)}] call EFUNC(common,addCanInteractWithCondition);

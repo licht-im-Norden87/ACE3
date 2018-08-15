@@ -2,37 +2,13 @@
 
 ADDON = false;
 
-PREP(debugDumpToClipboard);
-PREP(onListBoxSettingsChanged);
-PREP(onListBoxShowSelectionChanged);
-PREP(onSettingsMenuOpen);
-PREP(onSliderPosChanged);
-PREP(onServerSaveInputField);
-PREP(onServerSettingsMenuOpen);
-PREP(onServerListBoxShowSelectionChanged);
-PREP(onCategorySelectChanged);
-PREP(resetSettings);
-PREP(serverResetSettings);
-PREP(settingsMenuUpdateKeyView);
-PREP(settingsMenuUpdateList);
-PREP(serverSettingsMenuUpdateKeyView);
-PREP(serverSettingsMenuUpdateList);
-PREP(onServerCategorySelectChanged);
-PREP(updateSetting);
-PREP(exportSettings);
-PREP(toggleIncludeClientSettings);
-PREP(moduleAllowConfigExport);
-PREP(stringEscape);
+PREP_RECOMPILE_START;
+#include "XEH_PREP.hpp"
+PREP_RECOMPILE_END;
 
-GVAR(clientSideOptions) = [];
-GVAR(clientSideColors) = [];
-
-GVAR(serverConfigGeneration) = 0;
-GVAR(ClientSettingsExportIncluded) = false;
-GVAR(serverSideOptions) = [];
-GVAR(serverSideColors) = [];
-GVAR(serverSideValues) = [];
-GVAR(categories) = [];
-GVAR(currentCategorySelection) = 0;
+if (hasInterface) then {
+    [[format ["ACE %1", localize LSTRING(DumpDebug)], localize LSTRING(DumpDebugTooltip)], QGVAR(MainMenuHelperDumpDebug)] call CBA_fnc_addPauseMenuOption;
+    [[format ["ACE %1", localize LSTRING(headBugFix)], localize LSTRING(headBugFixTooltip)], QGVAR(MainMenuHelperHeadBugFix)] call CBA_fnc_addPauseMenuOption;
+};
 
 ADDON = true;

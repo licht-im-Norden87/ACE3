@@ -7,20 +7,21 @@
                 statement = ""; \
                 runOnHover = 1; \
                 showDisabled = 0; \
-                priority = 2; \
                 icon = "\A3\ui_f\data\igui\cfg\actions\repair_ca.paa"; \
                 distance = 4; \
-                exceptions[] = {"isNotOnLadder"}; \
+                exceptions[] = {"isNotSwimming", "isNotOnLadder"}; \
             }; \
         }; \
     };
 
+class CBA_Extended_EventHandlers_base;
+
 class CfgVehicles {
     class ACE_Module;
     class ACE_moduleRepairSettings: ACE_Module {
-        scope = 2;
+        scope = 1;
         displayName = CSTRING(moduleName);
-        icon = QUOTE(PATHTOF(ui\Icon_Module_Repair_ca.paa));
+        icon = QPATHTOF(ui\Icon_Module_Repair_ca.paa);
         category = "ACE_Logistics";
         function = QFUNC(moduleRepairSettings);
         functionPriority = 1;
@@ -30,23 +31,23 @@ class CfgVehicles {
         author = ECSTRING(Common,ACETeam);
         class Arguments {
             class engineerSetting_Repair {
-                displayName = CSTRING(enginerSetting_Repair_name);
-                description = CSTRING(enginerSetting_Repair_description);
+                displayName = CSTRING(engineerSetting_Repair_name);
+                description = CSTRING(engineerSetting_Repair_description);
                 typeName = "NUMBER";
                 class values {
                     class anyone { name = CSTRING(engineerSetting_anyone); value = 0; };
                     class Engineer { name = CSTRING(engineerSetting_EngineerOnly); value = 1; default = 1; };
-                    class Special { name = CSTRING(engineerSetting_RepairSpecialistOnly); value = 2; };
+                    class Advanced { name = CSTRING(engineerSetting_AdvancedOnly); value = 2; };
                 };
             };
             class engineerSetting_Wheel {
-                displayName = CSTRING(enginerSetting_Wheel_name);
-                description = CSTRING(enginerSetting_Wheel_description);
+                displayName = CSTRING(engineerSetting_Wheel_name);
+                description = CSTRING(engineerSetting_Wheel_description);
                 typeName = "NUMBER";
                 class values {
                     class anyone { name = CSTRING(engineerSetting_anyone); value = 0; default = 1; };
                     class Engineer { name = CSTRING(engineerSetting_EngineerOnly); value = 1; };
-                    class Special { name = CSTRING(engineerSetting_RepairSpecialistOnly); value = 2; };
+                    class Advanced { name = CSTRING(engineerSetting_AdvancedOnly); value = 2; };
                 };
             };
             class repairDamageThreshold {
@@ -89,7 +90,7 @@ class CfgVehicles {
                 class values {
                     class anyone { name = CSTRING(engineerSetting_anyone); value = 0; };
                     class Engineer { name = CSTRING(engineerSetting_EngineerOnly); value = 1; };
-                    class Special { name = CSTRING(engineerSetting_RepairSpecialistOnly); value = 2; default = 1;};
+                    class Advanced { name = CSTRING(engineerSetting_AdvancedOnly); value = 2; default = 1;};
                 };
             };
             class addSpareParts {
@@ -116,9 +117,9 @@ class CfgVehicles {
 
     class Module_F;
     class ACE_moduleAssignEngineerRoles: Module_F {
-        scope = 2;
+        scope = 1;
         displayName = CSTRING(AssignEngineerRole_Module_DisplayName);
-        icon = QUOTE(PATHTOF(ui\Icon_Module_Repair_ca.paa));
+        icon = QPATHTOF(ui\Icon_Module_Repair_ca.paa);
         category = "ACE_Logistics";
         function = QFUNC(moduleAssignEngineer);
         functionPriority = 10;
@@ -148,7 +149,7 @@ class CfgVehicles {
                         default = 1;
                     };
                     class doctor {
-                        name = CSTRING(AssignEngineerRole_role_specialist);
+                        name = CSTRING(AssignEngineerRole_role_advanced);
                         value = 2;
                     };
                 };
@@ -160,9 +161,9 @@ class CfgVehicles {
         };
     };
     class ACE_moduleAssignRepairVehicle: Module_F {
-        scope = 2;
+        scope = 1;
         displayName = CSTRING(AssignRepairVehicle_Module_DisplayName);
-        icon = QUOTE(PATHTOF(ui\Icon_Module_Repair_ca.paa));
+        icon = QPATHTOF(ui\Icon_Module_Repair_ca.paa);
         category = "ACE_Logistics";
         function = QFUNC(moduleAssignRepairVehicle);
         functionPriority = 10;
@@ -232,9 +233,9 @@ class CfgVehicles {
         };
     };
     class ACE_moduleAddSpareParts: Module_F {
-        scope = 2;
+        scope = 1;
         displayName = CSTRING(AddSpareParts_Module_DisplayName);
-        icon = QUOTE(PATHTOF(ui\Icon_Module_Repair_ca.paa));
+        icon = QPATHTOF(ui\Icon_Module_Repair_ca.paa);
         category = "ACE_Logistics";
         function = QFUNC(moduleAddSpareParts);
         functionPriority = 10;
@@ -288,6 +289,10 @@ class CfgVehicles {
         MACRO_REPAIRVEHICLE
     };
 
+    class Motorcycle: LandVehicle {
+        MACRO_REPAIRVEHICLE
+    };
+
     class Air;
     class Helicopter: Air {
         MACRO_REPAIRVEHICLE
@@ -304,12 +309,19 @@ class CfgVehicles {
 
     class ThingX;
     class ACE_RepairItem_Base: ThingX {
-        XEH_ENABLED;
-        icon = "iconObject_circle";
-        mapSize = 0.7;
+        class EventHandlers {
+            class CBA_Extended_EventHandlers: CBA_Extended_EventHandlers_base {};
+        };
+        class ACE_Actions {
+            class ACE_MainActions {
+                modifierFunction = QUOTE(_this call FUNC(modifyInteraction));
+            };
+        };
+
         accuracy = 0.2;
         vehicleClass = "ACE_Logistics_Items";
-        destrType = "DesturctNo";
+        editorCategory = "EdCat_Supplies";
+        editorSubcategory = QEGVAR(main,subcategory);
     };
 
     class ACE_Track: ACE_RepairItem_Base {
@@ -317,8 +329,29 @@ class CfgVehicles {
         EGVAR(cargo,canLoad) = 1;
         author = "Hawkins";
         scope = 2;
-        model = QUOTE(PATHTOF(data\ace_track.p3d));
+        model = QPATHTOF(data\ace_track.p3d);
         displayName = CSTRING(SpareTrack);
+        icon = "iconObject_2x1";
+        mapSize = 0.5;
+
+        // damage handling
+        armor = 1000;
+        armorStructural = 1;
+        minTotalDamageThreshold = 0.01;
+        explosionShielding = 1;
+        replaceDamagedLimit = 0.9;
+        selectionDamage = "mat_track";
+
+        class Damage {
+            tex[] = {};
+            mat[] = {
+                QPATHTO_R(data\trailObjects_steel.rvmat),
+                QPATHTO_R(data\trailObjects_steel_damage.rvmat),
+                QPATHTO_R(data\trailObjects_steel_destruct.rvmat)
+            };
+        };
+
+        editorPreview = QPATHTOF(data\preview_track.jpg);
     };
 
     class ACE_Wheel: ACE_RepairItem_Base {
@@ -326,13 +359,61 @@ class CfgVehicles {
         EGVAR(cargo,canLoad) = 1;
         author = "Hawkins";
         scope = 2;
-        model = QUOTE(PATHTOF(data\ace_wheel.p3d));
+        model = QPATHTOF(data\ace_wheel.p3d);
         displayName = CSTRING(SpareWheel);
-        picture = QUOTE(PATHTOF(ui\tire_ca.paa));
+        picture = QPATHTOF(ui\tire_ca.paa);
+        icon = "iconObject_circle";
+        mapSize = 0.7;
+
+        // damage handling
+        armor = 120;
+        armorStructural = 1;
+        minTotalDamageThreshold = 0.01;
+        explosionShielding = 1;
+        replaceDamagedLimit = 0.9;
+        selectionDamage = "mat_tyre"; //"mat_rim"
+
+        // necessary because only one "selectionDamage" (== "visual") is allowed for simple damage objects
+        // can not take damage individually though, because of limitations of the thingX simulation type
+        class HitPoints {
+            class HitBody {
+                armor = 0.6;
+                material = -1;
+                name = "mat_rim";
+                visual = "mat_rim";
+                passThrough = 1;
+                radius = 0.1;
+                explosionShielding = 1;
+            };
+        };
+
+        class Damage {
+            tex[] = {};
+            mat[] = {
+                QPATHTO_R(data\trailObjects_tyre.rvmat),
+                QPATHTO_R(data\trailObjects_tyre_damage.rvmat),
+                QPATHTO_R(data\trailObjects_tyre_damage.rvmat),
+                QPATHTO_R(data\trailObjects_steel.rvmat),
+                QPATHTO_R(data\trailObjects_steel_damage.rvmat),
+                QPATHTO_R(data\trailObjects_steel_destruct.rvmat)
+            };
+        };
+
+        editorPreview = QPATHTOF(data\preview_wheel.jpg);
     };
 
     // disable vanilla repair
     // "getNumber (_x >> ""transportRepair"") > 0" configClasses (configFile >> "CfgVehicles")
+    class ReammoBox_F;
+    class Land_RepairDepot_01_base_F: ReammoBox_F { // TanksDLC - Repair Depo Thing
+        GVAR(canRepair) = 1;
+        transportRepair = 0;
+    };
+    class Van_02_base_F;
+    class Van_02_service_base_F: Van_02_base_F { // OrangeDLC
+        GVAR(canRepair) = 1;
+        transportRepair = 0;
+    };
 
     class Slingload_01_Base_F;
     class B_Slingload_01_Repair_F: Slingload_01_Base_F {
@@ -342,7 +423,7 @@ class CfgVehicles {
 
     class Helicopter_Base_H;
     class Heli_Transport_04_base_F: Helicopter_Base_H {
-        GVAR(hitpointGroups[]) = { {"HitEngine", {"HitEngine1", "HitEngine2"}}, {"Glass_1_hitpoint", {"Glass_2_hitpoint", "Glass_3_hitpoint", "Glass_4_hitpoint", "Glass_5_hitpoint", "Glass_6_hitpoint", "Glass_7_hitpoint", "Glass_8_hitpoint", "Glass_9_hitpoint", "Glass_10_hitpoint", "Glass_11_hitpoint", "Glass_12_hitpoint", "Glass_13_hitpoint", "Glass_14_hitpoint", "Glass_15_hitpoint", "Glass_16_hitpoint", "Glass_17_hitpoint", "Glass_18_hitpoint", "Glass_19_hitpoint", "Glass_20_hitpoint"}} };
+        GVAR(hitpointGroups)[] = { {"HitEngine", {"HitEngine1", "HitEngine2"}} };
     };
     class O_Heli_Transport_04_repair_F: Heli_Transport_04_base_F {
         GVAR(canRepair) = 1;
@@ -357,12 +438,12 @@ class CfgVehicles {
 
     class Heli_Transport_02_base_F;
     class I_Heli_Transport_02_F: Heli_Transport_02_base_F {
-        GVAR(hitpointPositions[]) = {{"HitVRotor", {-1,-9.4,1.8}}, {"HitHRotor", {0,1.8,1.3}}};
+        GVAR(hitpointPositions)[] = {{"HitVRotor", {-1,-9.4,1.8}}, {"HitHRotor", {0,1.8,1.3}}};
     };
 
     class Helicopter_Base_F;
     class Heli_light_03_base_F: Helicopter_Base_F {
-        GVAR(hitpointPositions[]) = {{"HitVRotor", {-0.5,-5.55,1.2}}, {"HitHRotor", {0,1.8,1.5}}};
+        GVAR(hitpointPositions)[] = {{"HitVRotor", {-0.5,-5.55,1.2}}, {"HitHRotor", {0,1.8,1.5}}};
     };
 
     class B_APC_Tracked_01_base_F;
@@ -372,20 +453,14 @@ class CfgVehicles {
     };
 
     class B_APC_Tracked_01_AA_F: B_APC_Tracked_01_base_F {
-        GVAR(hitpointPositions[]) = {{"HitTurret", {0,-2,0}}};
+        GVAR(hitpointPositions)[] = {{"HitTurret", {0,-2,0}}};
     };
 
     class Car_F;
-    class Offroad_01_base_F: Car_F {
-        GVAR(hitpointGroups[]) = { {"HitGlass1", {"HitGlass2"}} };
-    };
+    class Offroad_01_base_F: Car_F {};
     class Offroad_01_repair_base_F: Offroad_01_base_F {
         GVAR(canRepair) = 1;
         transportRepair = 0;
-    };
-
-    class MRAP_01_base_F: Car_F {
-        GVAR(hitpointGroups[]) = { {"HitGlass1", {"HitGlass2", "HitGlass3", "HitGlass4", "HitGlass5", "HitGlass6"}} };
     };
 
     class B_Truck_01_mover_F;
@@ -404,7 +479,7 @@ class CfgVehicles {
         transportRepair = 0;
     };
 
-    class Truck_02_engineeral_base_F: Truck_02_box_base_F {
+    class Truck_02_medical_base_F: Truck_02_box_base_F {
         GVAR(canRepair) = 0;
     };
 
@@ -414,11 +489,10 @@ class CfgVehicles {
         transportRepair = 0;
     };
 
-    class Quadbike_01_base_F;
-    class B_Quadbike_01_F: Quadbike_01_base_F {
-        GVAR(hitpointPositions[]) = { {"HitEngine", {0, 0.5, -0.7}}, {"HitFuel", {0, 0, -0.5}} };
+    class Quadbike_01_base_F: Car_F {
+        GVAR(hitpointPositions)[] = { {"HitEngine", {0, 0.5, -0.7}}, {"HitFuel", {0, 0, -0.5}} };
     };
     class Hatchback_01_base_F: Car_F {
-        GVAR(hitpointPositions[]) = {{"HitBody", {0, 0.7, -0.5}}, {"HitFuel", {0, -1.75, -0.75}}};
+        GVAR(hitpointPositions)[] = {{"HitBody", {0, 0.7, -0.5}}, {"HitFuel", {0, -1.75, -0.75}}};
     };
 };

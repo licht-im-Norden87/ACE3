@@ -2,11 +2,10 @@
 
 ADDON = false;
 
-PREP(blending);
-PREP(changeNVGBrightness);
-PREP(initModule);
-PREP(onCameraViewChanged);
-PREP(onVisionModeChanged);
-PREP(updatePPEffects);
+PREP_RECOMPILE_START;
+#include "XEH_PREP.hpp"
+PREP_RECOMPILE_END;
+
+#include "initSettings.sqf";
 
 ADDON = true;

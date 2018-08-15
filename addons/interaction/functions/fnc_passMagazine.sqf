@@ -6,7 +6,7 @@
  * 0: Unit that passes the magazine <OBJECT>
  * 1: Unit to pass the magazine to <OBJECT>
  * 2: Weapon classname <STRING>
- * 
+ *
  * Return Value:
  * None
  *
@@ -18,17 +18,13 @@
 
 #include "script_component.hpp"
 params ["_player", "_target", "_weapon"];
-private ["_compatibleMags", "_filteredMags", "_magToPass", "_magToPassIndex", "_playerName", "_magToPassDisplayName"];
 
-_compatibleMags = getArray (configfile >> "CfgWeapons" >> _weapon >> "magazines");
-_filteredMags = [magazinesAmmoFull _player, {
-    params ["_className", "", "_loaded"];
-    _className in _compatibleMags && !_loaded
-}] call EFUNC(common,filter);
+private _compatibleMags = getArray (configfile >> "CfgWeapons" >> _weapon >> "magazines");
+private _filteredMags = magazinesAmmoFull _player select {(_x select 0) in _compatibleMags && {!(_x select 2)}};
 
 //select magazine with most ammo
-_magToPass = _filteredMags select 0;
-_magToPassIndex = 0;
+private _magToPass = _filteredMags select 0;
+private _magToPassIndex = 0;
 {
     _x params ["_className", "_ammoCount"];
     if ((_ammoCount > (_magToPass select 1)) && (_target canAdd _className)) then {
@@ -48,10 +44,10 @@ _player removeMagazines _magToPassClassName;
     };
 } foreach _filteredMags;
 
-_player playActionNow "PutDown";
+[_player, "PutDown"] call EFUNC(common,doGesture);
 
 _target addMagazine [_magToPassClassName, _magToPassAmmoCount];
 
-_playerName = [_player] call EFUNC(common,getName);
-_magToPassDisplayName = getText (configFile >> "CfgMagazines" >> _magToPassClassName >> "displayName");
-["displayTextStructured", [_target], [[LSTRING(PassMagazineHint), _playerName, _magToPassDisplayName], 1.5, _target]] call EFUNC(common,targetEvent);
+private _playerName = [_player] call EFUNC(common,getName);
+private _magToPassDisplayName = getText (configFile >> "CfgMagazines" >> _magToPassClassName >> "displayName");
+[QEGVAR(common,displayTextStructured), [[LSTRING(PassMagazineHint), _playerName, _magToPassDisplayName], 1.5, _target], [_target]] call CBA_fnc_targetEvent;

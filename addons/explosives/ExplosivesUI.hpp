@@ -80,7 +80,7 @@ class RscACE_SelectTimeUI {
             y = 0.06;
             w = 0.49;
             h = 0.025;
-            onSliderPosChanged = "private ['_mins', '_secs'];_mins = floor((_this select 1)/60);_secs=floor((_this select 1) - (_mins*60));ctrlSetText [8870, format[localize 'STR_ACE_Explosives_TimerMenu',_mins, _secs]];";
+            onSliderPosChanged = "_mins = floor((_this select 1)/60);_secs=floor((_this select 1) - (_mins*60));ctrlSetText [8870, format[localize 'STR_ACE_Explosives_TimerMenu',_mins, _secs]];";
         };
         class cancelBtn: RscButton {
             idc = 8855;
@@ -113,7 +113,7 @@ class Rsc_ACE_PhoneInterface {
     class controls {
         class RscPicture_1200: RscPicture {
             idc = 1200;
-            text = PATHTOF(Data\UI\Cellphone_Background.paa);
+            text = QPATHTOF(Data\UI\Cellphone_Background.paa);
             x = 0.231875 * safezoneW + safezoneX;
             y = 0.104 * safezoneH + safezoneY;
             w = 0.195937 * safezoneW;

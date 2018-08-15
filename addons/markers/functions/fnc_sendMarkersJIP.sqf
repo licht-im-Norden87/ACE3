@@ -15,11 +15,11 @@
  */
 #include "script_component.hpp"
 
-params ["_logic"];
-TRACE_1("params",_logic);
+params ["_owner"];
+TRACE_1("params",_owner);
 
 [
     QGVAR(setMarkerJIP),
-    [_logic],
-    [GETGVAR(allMapMarkers,[]), GETGVAR(allMapMarkersProperties,[]), _logic]
-] call EFUNC(common,targetEvent);
+    [GETGVAR(allMapMarkers,[]), GETGVAR(allMapMarkersProperties,[])],
+    _owner
+] call CBA_fnc_ownerEvent;

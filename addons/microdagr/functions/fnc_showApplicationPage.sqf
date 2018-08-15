@@ -15,11 +15,9 @@
  */
 #include "script_component.hpp"
 
-private ["_display", "_theMap", "_mapSize"];
-
 disableSerialization;
 
-_display = uiNamespace getVariable [[QGVAR(RscTitleDisplay), QGVAR(DialogDisplay)] select (GVAR(currentShowMode) == DISPLAY_MODE_DIALOG), displayNull];
+private _display = uiNamespace getVariable [[QGVAR(RscTitleDisplay), QGVAR(DialogDisplay)] select (GVAR(currentShowMode) == DISPLAY_MODE_DIALOG), displayNull];
 
 if (isNull _display) exitWith {ERROR("No Display");};
 
@@ -38,9 +36,9 @@ if (GVAR(currentApplicationPage) == APP_MODE_INFODISPLAY) then {
         (_display displayCtrl IDC_MODEDISPLAY_MODEPOSTIMECG) ctrlShow false;
         (_display displayCtrl IDC_MODEDISPLAY_MODEPOSTARGETCG) ctrlShow true;
         if (GVAR(currentWaypoint) == -2) then {
-            (_display displayCtrl IDC_MODEDISPLAY_TARGETICON) ctrlSetText "\A3\ui_f\data\igui\rscingameui\rscoptics\laser_designator_iconLaserOn.paa"
+            (_display displayCtrl IDC_MODEDISPLAY_TARGETICON) ctrlSetText QUOTE(PATHTOF(images\icon_menuLaser.paa));
         } else {
-            (_display displayCtrl IDC_MODEDISPLAY_TARGETICON) ctrlSetText QUOTE(PATHTOF(images\icon_menuMark.paa));
+            (_display displayCtrl IDC_MODEDISPLAY_TARGETICON) ctrlSetText QPATHTOF(images\icon_menuMark.paa);
         };
     };
 };
@@ -100,19 +98,19 @@ if (GVAR(currentApplicationPage) == APP_MODE_MARK) then {
 
 //Buttons pushed:
 if (GVAR(currentApplicationPage) == APP_MODE_INFODISPLAY) then {
-    (_display displayCtrl IDC_BUTTONBG0) ctrlSetText QUOTE(PATHTOF(images\button_pushedDown.paa));
+    (_display displayCtrl IDC_BUTTONBG0) ctrlSetText QPATHTOF(images\button_pushedDown.paa);
 } else {
-    (_display displayCtrl IDC_BUTTONBG0) ctrlSetText QUOTE(PATHTOF(images\button_pushedUp.paa));
+    (_display displayCtrl IDC_BUTTONBG0) ctrlSetText QPATHTOF(images\button_pushedUp.paa);
 };
 if (GVAR(currentApplicationPage) == APP_MODE_COMPASS) then {
-    (_display displayCtrl IDC_BUTTONBG1) ctrlSetText QUOTE(PATHTOF(images\button_pushedDown.paa));
+    (_display displayCtrl IDC_BUTTONBG1) ctrlSetText QPATHTOF(images\button_pushedDown.paa);
 } else {
-    (_display displayCtrl IDC_BUTTONBG1) ctrlSetText QUOTE(PATHTOF(images\button_pushedUp.paa));
+    (_display displayCtrl IDC_BUTTONBG1) ctrlSetText QPATHTOF(images\button_pushedUp.paa);
 };
 if (GVAR(currentApplicationPage) == APP_MODE_MAP) then {
-    (_display displayCtrl IDC_BUTTONBG2) ctrlSetText QUOTE(PATHTOF(images\button_pushedDown.paa));
+    (_display displayCtrl IDC_BUTTONBG2) ctrlSetText QPATHTOF(images\button_pushedDown.paa);
 } else {
-    (_display displayCtrl IDC_BUTTONBG2) ctrlSetText QUOTE(PATHTOF(images\button_pushedUp.paa));
+    (_display displayCtrl IDC_BUTTONBG2) ctrlSetText QPATHTOF(images\button_pushedUp.paa);
 };
 
 //Update the page now:

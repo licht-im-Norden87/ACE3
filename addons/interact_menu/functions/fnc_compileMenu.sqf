@@ -2,15 +2,18 @@
  * Author: NouberNou and esteldunedain
  * Compile the action menu from config for an object's class
  *
- * Argument:
+ * Arguments:
  * 0: Object or class name <OBJECT> or <STRING>
  *
- * Return value:
+ * Return Value:
  * None
+ *
+ * Example:
+ * [bob] call ACE_interact_menu_fnc_compileMenu
  *
  * Public: No
  */
-#include "script_component.hpp";
+#include "script_component.hpp"
 
 params ["_target"];
 
@@ -18,10 +21,10 @@ private _objectType = _target;
 if (_target isEqualType objNull) then {
     _objectType = typeOf _target;
 };
-private _actionsVarName = format [QGVAR(Act_%1), _objectType];
+private _namespace = GVAR(ActNamespace);
 
 // Exit if the action menu is already compiled for this class
-if !(isNil {missionNamespace getVariable [_actionsVarName, nil]}) exitWith {};
+if !(isNil {_namespace getVariable _objectType}) exitWith {};
 
 private _recurseFnc = {
     params ["_actionsCfg", "_parentDistance"];
@@ -33,8 +36,12 @@ private _recurseFnc = {
             private _displayName = getText (_entryCfg >> "displayName");
             private _distance = _parentDistance;
             if (isNumber (_entryCfg >> "distance")) then {_distance = getNumber (_entryCfg >> "distance");};
-            // if (_distance < _parentDistance) then {ACE_LOGWARNING_3("[%1] distance %2 less than parent %3", configName _entryCfg, _distance, _parentDistance);};
-            private _icon = getText (_entryCfg >> "icon");
+            // if (_distance < _parentDistance) then {WARNING_3("[%1] distance %2 less than parent %3", configName _entryCfg, _distance, _parentDistance);};
+            private _icon = if (isArray (_entryCfg >> "icon")) then {
+                getArray (_entryCfg >> "icon");
+            } else {
+                [getText (_entryCfg >> "icon"), "#FFFFFF"];
+            };
             private _statement = compile (getText (_entryCfg >> "statement"));
 
             // If the position entry is present, compile it
@@ -99,12 +106,33 @@ private _recurseFnc = {
     _actions
 };
 
+if ((getNumber (configFile >> "CfgVehicles" >> _objectType >> "isPlayableLogic")) == 1) exitWith {
+    TRACE_1("skipping playable logic",_objectType);
+    _namespace setVariable [_objectType, []];
+};
+
 private _actionsCfg = configFile >> "CfgVehicles" >> _objectType >> "ACE_Actions";
 
 TRACE_1("Building ACE_Actions",_objectType);
 private _actions = [_actionsCfg, 0] call _recurseFnc;
 
-missionNamespace setVariable [_actionsVarName, _actions];
+// ace_interaction_fnc_addPassengerAction expects ACE_MainActions to be first
+// Other mods can change the order that configs are added, so we should verify this now and resort if needed
+if (_objectType isKindOf "CaManBase") then {
+    if ((((_actions select 0) select 0) select 0) != "ACE_MainActions") then {
+        INFO_1("ACE_MainActions not first for man [%1]",_objectType);
+        private _mainActions = [];
+        {
+            if (((_x select 0) select 0) == "ACE_MainActions") then {
+                _mainActions = _actions deleteAt _forEachIndex;
+            };
+        } forEach _actions;
+        if (_mainActions isEqualTo []) exitWith {ERROR_1("ACE_MainActions not found on man [%1]",_objectType);};
+        _actions = [_mainActions] + _actions; // resort array with ACE_MainActions first
+    };
+};
+
+_namespace setVariable [_objectType, _actions];
 
 /*
 [

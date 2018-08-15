@@ -20,4 +20,4 @@ params ["_obj", "_dirAndUp"];
 
 _obj setVectorDirAndUp _dirAndUp;
 _obj allowDamage false;
-player disableCollisionWith _obj;
+ACE_player disableCollisionWith _obj;

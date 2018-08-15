@@ -22,9 +22,7 @@ if (inputAction "nextWeapon" > 0) exitWith {};
 
 params ["_unit", "_weapon", "_muzzle"];
 
-private ["_safedWeapons", "_picture"];
-
-_safedWeapons = _unit getVariable [QGVAR(safedWeapons), []];
+private _safedWeapons = _unit getVariable [QGVAR(safedWeapons), []];
 
 if (_weapon in _safedWeapons) exitWith {
     _this call FUNC(unlockSafety);
@@ -38,7 +36,7 @@ if (_unit getVariable [QGVAR(actionID), -1] == -1) then {
     _unit setVariable [QGVAR(actionID), [
         _unit, "DefaultAction", {
             if (
-                [_this select 1] call EFUNC(common,canUseWeapon)
+                [_this select 1] call CBA_fnc_canUseWeapon
                 && {
                     if (currentMuzzle (_this select 1) in ((_this select 1) getVariable [QGVAR(safedWeapons), []])) then {
                         if (inputAction "nextWeapon" > 0) exitWith {
@@ -69,5 +67,5 @@ if (_muzzle isEqualType "") then {
 [_unit, _weapon, _muzzle] call FUNC(playChangeFiremodeSound);
 
 // show info box
-_picture = getText (configFile >> "CfgWeapons" >> _weapon >> "picture");
+private _picture = getText (configFile >> "CfgWeapons" >> _weapon >> "picture");
 [localize LSTRING(PutOnSafety), _picture] call EFUNC(common,displayTextPicture);

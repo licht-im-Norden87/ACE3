@@ -7,10 +7,9 @@ class CfgVehicles {
                 class GVAR(open) {
                     displayName = CSTRING(activateMonitor);
                     condition = QUOTE([ARR_2(ACE_player,'ACE_HuntIR_monitor')] call EFUNC(common,hasItem));
-                    statement = QUOTE(call FUNC(huntir));
+                    statement = QUOTE([FUNC(huntir)] call CBA_fnc_execNextFrame;);
                     showDisabled = 0;
-                    priority = 2;
-                    icon = PATHTOF(UI\w_huntir_monitor_ca.paa);
+                    icon = QPATHTOF(UI\w_huntir_monitor_ca.paa);
                     exceptions[] = {};
                 };
             };
@@ -23,7 +22,7 @@ class CfgVehicles {
         castDriverShadow = 0;
         destrType = "DestructDefault";
         displayName = "HuntIR";
-        model = PATHTOF(data\huntir.p3d);
+        model = QPATHTOF(data\huntir.p3d);
         scope = 1;
         soundCrash[] = {"", db-30, 1 };
         soundEnviron[] = {"z\ace\addons\apl\sounds\padak_let", 0.316228, 1, 80};
@@ -73,7 +72,7 @@ class CfgVehicles {
 
     class ReammoBox_F;
     class ACE_HuntIR_Box: ReammoBox_F {
-        model = PATHTOF(data\ace_huntirbox.p3d);
+        model = QPATHTOF(data\ace_huntirbox.p3d);
         displayName = $STR_DN_ACE_HUNTIRBOX;
         class TransportItems {
             MACRO_ADDITEM(ACE_HuntIR_monitor,5);

@@ -2,19 +2,20 @@
 
 class CfgPatches {
     class ADDON {
-        units[] = {"ACE_Comanche_Test"};
+        name = COMPONENT_NAME;
+        units[] = {};
         weapons[] = {};
         requiredVersion = REQUIRED_VERSION;
         requiredAddons[] = {"ace_laser"};
+        author = ECSTRING(common,ACETeam);
+        url = ECSTRING(main,URL);
         VERSION_CONFIG;
     };
 };
 
 #include "ACE_GuidanceConfig.hpp"
-#include "ACE_Settings.hpp"
 
 #include "CfgEventhandlers.hpp"
 #include "CfgAmmo.hpp"
 #include "CfgMagazines.hpp"
 #include "CfgWeapons.hpp"
-#include "CfgVehicles.hpp"

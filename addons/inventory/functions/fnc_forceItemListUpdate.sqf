@@ -8,6 +8,9 @@
  * Return Value:
  * None
  *
+ * Example:
+ * [DISPLAY] call ACE_inventory_fnc_forceitemListUpdate
+ *
  * Public: No
  */
 #include "script_component.hpp"
@@ -23,12 +26,9 @@ if (_filterFunction isEqualType {}) then {
     private _i = 0;
 
     while {_i < lbSize _itemList} do {
-        private _config = uiNamespace getVariable [
-            format [QGVAR(ItemKey:%1:%2), _itemList lbText _i, _itemList lbPicture _i],
-            configNull
-        ];
+        private _config = GVAR(ItemKeyNamespace) getVariable format ["%1:%2", _itemList lbText _i, _itemList lbPicture _i];
 
-        if (!isNull _config && {!(_config call _filterFunction)}) then {
+        if (!isNil "_config" && {!(_config call _filterFunction)}) then {
             _itemList lbDelete _i;
 
             // in case the filter function returns nil. Otherwise could lock up the game.

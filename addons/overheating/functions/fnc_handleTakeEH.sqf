@@ -3,17 +3,22 @@
  * Handle "take" event
  * I think it fixs jams when manually dragging a new magazine in from player's inventory
  *
- * Argument:
+ * Arguments:
  * 0: unit - Object the event handler is assigned to <OBJECT>
  * 1: container <OBJECT>
  * 2: item <STRING>
  *
- * Return value:
+ * Return Value:
  * None
+ *
+ * Example:
+ * [bob, thing, "thing"] call ace_overheating_fnc_handleTakeEH
  *
  * Public: No
  */
 #include "script_component.hpp"
+
+if !(GVAR(unJamOnreload)) exitWith {};
 
 params ["_unit", "_container", "_item"];
 TRACE_3("params",_unit,_container,_item);

@@ -2,12 +2,12 @@
  * Author: commy2, NouberNou and esteldunedain
  * Removes an action from an object
  *
- * Argument:
+ * Arguments:
  * 0: Object the action is assigned to <OBJECT>
  * 1: Type of action, 0 for actions, 1 for self-actions <NUMBER>
  * 2: Full path of the action to remove <ARRAY>
  *
- * Return value:
+ * Return Value:
  * None
  *
  * Example:
@@ -19,12 +19,11 @@
 
 params ["_object", "_typeNum", "_fullPath"];
 
-private ["_res","_varName","_actionList"];
-_res = _fullPath call FUNC(splitPath);
+private _res = _fullPath call FUNC(splitPath);
 _res params ["_parentPath", "_actionName"];
 
-_varName = [QGVAR(actions),QGVAR(selfActions)] select _typeNum;
-_actionList = _object getVariable [_varName, []];
+private _varName = [QGVAR(actions),QGVAR(selfActions)] select _typeNum;
+private _actionList = _object getVariable [_varName, []];
 {
     if (((_x select 0) select 0) isEqualTo _actionName &&
         {(_x select 1) isEqualTo _parentPath}) exitWith {

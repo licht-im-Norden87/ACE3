@@ -1,14 +1,14 @@
 class CfgVehicles {
     class ACE_Module;
     class GVAR(moduleSettings): ACE_Module {
-        scope = 2;
+        scope = 1;
         category = "ACE";
         displayName = CSTRING(moduleSettings_displayName);
         function = QFUNC(moduleSettings);
-        isGlobal = 0;
+        isGlobal = 1;
         isSingular = 1;
         author = ECSTRING(common,ACETeam);
-        icon = PATHTOF(ui\icon_module_map_gestures_ca.paa);
+        icon = QPATHTOF(ui\icon_module_map_gestures_ca.paa);
         class Arguments {
             class enabled {
                 displayName = CSTRING(enabled_DisplayName);
@@ -47,9 +47,9 @@ class CfgVehicles {
         category = "ACE";
         displayName = CSTRING(moduleGroupSettings_displayName);
         function = QFUNC(moduleGroupSettings);
-        isGlobal = 0;
+        isGlobal = 2;
         author = ECSTRING(common,ACETeam);
-        icon = PATHTOF(ui\icon_module_map_gestures_ca.paa);
+        icon = QPATHTOF(ui\icon_module_map_gestures_ca.paa);
         class Arguments {
             class leadColor {
                 displayName = CSTRING(leadColor_displayName);

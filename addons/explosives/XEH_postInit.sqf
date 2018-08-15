@@ -16,17 +16,31 @@
 #include "script_component.hpp"
 
 //Event for setting explosive placement angle/pitch:
-[QGVAR(place), {_this call FUNC(setPosition)}] call EFUNC(common,addEventHandler);
+[QGVAR(place), {_this call FUNC(setPosition)}] call CBA_fnc_addEventHandler;
+[QGVAR(startDefuse), FUNC(startDefuse)] call CBA_fnc_addEventHandler;
 
 //When getting knocked out in medical, trigger deadman explosives:
 //Event is global, only run on server (ref: ace_medical_fnc_setUnconscious)
 if (isServer) then {
-    ["medical_onUnconscious", {
+    [QGVAR(detonate), {
+        params ["_unit", "_explosive", "_delay"];
+        TRACE_3("server detonate EH",_unit,_explosive,_delay);
+        _explosive setShotParents [_unit, _unit];
+        [{
+            params ["_explosive"];
+            TRACE_1("exploding",_explosive);
+            if (!isNull _explosive) then {
+                _explosive setDamage 1;
+            };
+        }, _explosive, _delay] call CBA_fnc_waitAndExecute;
+    }] call CBA_fnc_addEventHandler;
+
+    ["ace_unconscious", {
         params ["_unit", "_isUnconscious"];
         if (!_isUnconscious) exitWith {};
         TRACE_1("Knocked Out, Doing Deadman", _unit);
         [_unit] call FUNC(onIncapacitated);
-    }] call EFUNC(common,addEventHandler);
+    }] call CBA_fnc_addEventHandler;
 };
 
 if (!hasInterface) exitWith {};
@@ -36,18 +50,7 @@ GVAR(Setup) = objNull;
 GVAR(pfeh_running) = false;
 GVAR(CurrentSpeedDial) = 0;
 
-// Properly angle preplaced bottom-attack SLAMs
-{
-    if (local _x) then {
-        switch (typeOf _x) do {
-            case ("ACE_SLAMDirectionalMine_Magnetic_Ammo"): {
-                [_x, getDir _x, 90] call FUNC(setPosition);
-            };
-        };
-    };
-} forEach allMines;
-
-["interactMenuOpened", {
+["ace_interactMenuOpened", {
     //Cancel placement if interact menu opened
     if (GVAR(pfeh_running)) then {
         GVAR(placeAction) = PLACE_CANCEL;
@@ -56,6 +59,4 @@ GVAR(CurrentSpeedDial) = 0;
     //Show defuse actions on CfgAmmos (allMines):
     _this call FUNC(interactEH);
 
-}] call EFUNC(common,addEventHandler);
-
-[{(_this select 0) call FUNC(handleScrollWheel);}] call EFUNC(common,addScrollWheelEventHandler);
+}] call CBA_fnc_addEventHandler;

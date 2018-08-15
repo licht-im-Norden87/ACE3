@@ -8,6 +8,9 @@
  * Return Value:
  * Function is handled? <BOOL>
  *
+ * Example:
+ * [bob] call ace_goggles_fnc_handleExplosion
+ *
  * Public: No
  */
 #include "script_component.hpp"
@@ -20,18 +23,16 @@ call FUNC(applyDirtEffect);
 
 if (GETBROKEN) exitWith {true};
 
-private ["_config", "_effects"];
-
-_config = configFile >> "CfgGlasses" >> goggles _unit;
+private _config = configFile >> "CfgGlasses" >> goggles _unit;
 
 if ((_this select 1) call FUNC(GetExplosionIndex) < getNumber (_config >> "ACE_Resistance")) exitWith {true};
 
 if !([_unit] call FUNC(isGogglesVisible)) exitWith {
-    ["GlassesCracked", [_unit]] call EFUNC(common,localEvent);
+    ["ace_glassesCracked", [_unit]] call CBA_fnc_localEvent;
     true
 };
 
-_effects = GETGLASSES(_unit);
+private _effects = GETGLASSES(_unit);
 _effects set [BROKEN, true];
 
 SETGLASSES(_unit,_effects);
@@ -46,5 +47,5 @@ if (getText (_config >> "ACE_OverlayCracked") != "") then {
     (GLASSDISPLAY displayCtrl 10650) ctrlSetText getText (_config >> "ACE_OverlayCracked");
 };
 
-["GlassesCracked", [_unit]] call EFUNC(common,localEvent);
+["ace_glassesCracked", [_unit]] call CBA_fnc_localEvent;
 true

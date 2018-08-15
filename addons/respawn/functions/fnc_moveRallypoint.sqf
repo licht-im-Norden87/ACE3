@@ -18,9 +18,7 @@
 
 params ["_unit", "_side"];
 
-private ["_rallypoint", "_position"];
-
-_rallypoint = [
+private _rallypoint = [
     objNull,
     missionNamespace getVariable ["ACE_Rallypoint_West", objNull],
     missionNamespace getVariable ["ACE_Rallypoint_East", objNull],
@@ -31,7 +29,7 @@ TRACE_3("moving rally",_unit,_rallypoint,typeOf _rallypoint);
 
 if (isNull _rallypoint) exitWith {};
 
-_position = getPosATL _unit;
+private _position = getPosATL _unit;
 _position = _position findEmptyPosition [0, 2, typeOf _rallypoint];
 
 if (_position isEqualTo []) then {_position = getPosATL _unit};
@@ -48,7 +46,7 @@ _position set [2, 0];
 
     _rallypoint setVariable [QGVAR(markerDate), [dayTime, "HH:MM"] call BIS_fnc_timeToString, true];
 
-    ["rallypointMoved", [_rallypoint, _side, _position]] call EFUNC(common,globalEvent);
+    ["ace_rallypointMoved", [_rallypoint, _side, _position]] call CBA_fnc_globalEvent;
 
     [localize LSTRING(Deployed)] call EFUNC(common,displayTextStructured);
-}, [_rallypoint, _unit, _position], 5] call EFUNC(common,waitAndExecute);
+}, [_rallypoint, _unit, _position], 5] call CBA_fnc_waitAndExecute;

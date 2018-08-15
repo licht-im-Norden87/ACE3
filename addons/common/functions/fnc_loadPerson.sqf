@@ -1,13 +1,17 @@
 /*
  * Author: Glowbal
- * Loads a specified unit into any nearby vehicle
+ * Loads a specified unit into any nearby vehicle, or _vehicle parameter.
  *
  * Arguments:
  * 0: Unit that will load <OBJECT>
  * 1: Unit to be loaded <OBJECT>
+ * 2: Vehicle that the unit will be loaded in <OBJECT> (default: objNull)
  *
  * Return Value:
- * the vehicle that the unitToBeloaded has been loaded in. Returns ObjNull if function failed <OBJECT>
+ * Vehicle that the unitToBeloaded has been loaded in. Returns objNull if function failed <OBJECT>
+ *
+ * Example:
+ * [bob, kevin] call ace_common_fnc_loadPerson
  *
  * Public: Yes
  */
@@ -15,39 +19,18 @@
 
 #define GROUP_SWITCH_ID QFUNC(loadPerson)
 
-params ["_caller", "_unit"];
+params ["_caller", "_unit", ["_vehicle", objNull]];
 
-private _vehicle = objNull;
+if (!([_caller, _unit, ["isNotDragging", "isNotCarrying", "isNotSwimming"]] call FUNC(canInteractWith)) || {_caller == _unit}) exitWith {_vehicle};
 
-if (!([_caller, _unit, ["isNotDragging", "isNotCarrying"]] call FUNC(canInteractWith)) || {_caller == _unit}) exitWith {_vehicle};
-
-private _loadcar = nearestObject [_unit, "Car"];
-
-if (_unit distance _loadcar <= 10) then {
-    _vehicle = _loadcar;
-} else {
-    private _loadair = nearestObject [_unit, "Air"];
-
-    if (_unit distance _loadair <= 10) then {
-        _vehicle = _loadair;
-    } else {
-        private _loadtank = nearestObject [_unit, "Tank"];
-
-        if (_unit distance _loadtank <= 10) then {
-            _vehicle = _loadtank;
-        } else {
-            private _loadboat = nearestObject [_unit, "Ship_F"];
-
-            if (_unit distance _loadboat <= 10) then {
-                _vehicle = _loadboat;
-            };
-        };
-    };
+// Try to use nearest vehicle if a vehicle hasn't been supplied
+if (isNull _vehicle) then {
+    _vehicle = ([_unit] call FUNC(nearestVehiclesFreeSeat)) param [0, objNull];
 };
 
 if (!isNull _vehicle) then {
     [_unit, true, GROUP_SWITCH_ID, side group _caller] call FUNC(switchToGroupSide);
-    [[_unit, _vehicle, _caller], QFUNC(loadPersonLocal), _unit, false] call FUNC(execRemoteFnc);
+    ["ace_loadPersonEvent", [_unit, _vehicle, _caller], _unit] call CBA_fnc_targetEvent;
 };
 
 _vehicle

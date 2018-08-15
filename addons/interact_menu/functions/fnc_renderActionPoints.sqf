@@ -2,11 +2,14 @@
  * Author: NouberNou and esteldunedain
  * Render all action points
  *
- * Argument:
+ * Arguments:
  * None
  *
- * Return value:
+ * Return Value:
  * None
+ *
+ * Example:
+ * call ACE_interact_menu_fnc_renderActionPoints
  *
  * Public: No
  */
@@ -16,15 +19,15 @@ GVAR(currentOptions) = [];
 
 private _player = ACE_player;
 
-private _cameraPosASL = AGLtoASL (positionCameraToWorld [0, 0, 0]);
-private _cameraDir = (AGLtoASL (positionCameraToWorld [0, 0, 1])) vectorDiff _cameraPosASL;
+GVAR(cameraPosASL) = AGLtoASL (positionCameraToWorld [0, 0, 0]);
+GVAR(cameraDir) = (AGLtoASL (positionCameraToWorld [0, 0, 1])) vectorDiff GVAR(cameraPosASL);
 
 private _fnc_renderNearbyActions = {
     // Render all nearby interaction menus
     #define MAXINTERACTOBJECTS 3
 
     GVAR(foundActions) = [];
-    GVAR(lastTimeSearchedActions) = ACE_diagTime;
+    GVAR(lastTimeSearchedActions) = diag_tickTime;
 
     private _numInteractObjects = 0;
     private _nearestObjects = nearestObjects [ACE_player, ["All"], 13];
@@ -32,7 +35,7 @@ private _fnc_renderNearbyActions = {
         private _target = _x;
 
         // Quick oclussion test. Skip objects more than 1 m behind the camera plane
-        private _lambda = ((getPosASL _x) vectorDiff _cameraPosASL) vectorDotProduct _cameraDir;
+        private _lambda = ((getPosASL _x) vectorDiff GVAR(cameraPosASL)) vectorDotProduct GVAR(cameraDir);
         if ((_lambda > -1) && {!isObjectHidden _target}) then {
             private _numInteractions = 0;
             // Prevent interacting with yourself or your own vehicle
@@ -54,8 +57,9 @@ private _fnc_renderNearbyActions = {
                 } count GVAR(objectActionList);
 
                 // Iterate through base level class actions and render them if appropiate
-                private _actionsVarName = format [QGVAR(Act_%1), typeOf _target];
-                private _classActions = missionNamespace getVariable [_actionsVarName, []];
+                private _namespace = GVAR(ActNamespace);
+                private _classActions = _namespace getVariable typeOf _target;
+
                 {
                     private _action = _x;
                     // Try to render the menu
@@ -95,8 +99,8 @@ private _fnc_renderSelfActions = {
     GVAR(objectActionList) = _target getVariable [QGVAR(selfActions), []];
 
     // Iterate through base level class actions and render them if appropiate
-    private _actionsVarName = format [QGVAR(SelfAct_%1), typeOf _target];
-    private _classActions = missionNamespace getVariable [_actionsVarName, []];
+    private _namespace = GVAR(ActSelfNamespace);
+    private _classActions = _namespace getVariable typeOf _target;
 
     private _pos = if !(GVAR(useCursorMenu)) then {
         //Convert to ASL, add offset and then convert back to AGL (handles waves when over water)
@@ -126,17 +130,22 @@ GVAR(collectedActionPoints) resize 0;
 // Render nearby actions, unit self actions or vehicle self actions as appropiate
 if (GVAR(openedMenuType) == 0) then {
     if (isNull curatorCamera) then {
-        if (vehicle ACE_player == ACE_player) then {
-            if (ACE_diagTime > GVAR(lastTimeSearchedActions) + 0.20) then {
-                // Once every 0.2 secs, collect nearby objects active and visible action points and render them
-                call _fnc_renderNearbyActions;
-            } else {
-                // The rest of the frames just draw the same action points rendered the last frame
-                call _fnc_renderLastFrameActions;
-            };
+        if (!(isNull (ACE_controlledUAV select 0))) then {
+            // Render UAV self actions when in control of UAV AI
+            (ACE_controlledUAV select 0) call _fnc_renderSelfActions;
         } else {
-            // Render vehicle self actions when in vehicle
-            (vehicle ACE_player) call _fnc_renderSelfActions;
+            if (vehicle ACE_player == ACE_player) then {
+                if (diag_tickTime > GVAR(lastTimeSearchedActions) + 0.20) then {
+                    // Once every 0.2 secs, collect nearby objects active and visible action points and render them
+                    call _fnc_renderNearbyActions;
+                } else {
+                    // The rest of the frames just draw the same action points rendered the last frame
+                    call _fnc_renderLastFrameActions;
+                };
+            } else {
+                // Render vehicle self actions when in vehicle
+                (vehicle ACE_player) call _fnc_renderSelfActions;
+            };
         };
     } else {
         // Render zeus actions when zeus open
@@ -158,7 +167,7 @@ if (count GVAR(collectedActionPoints) > 1) then {
             private _delta = vectorNormalized ((GVAR(collectedActionPoints) select _i select 1) vectorDiff (GVAR(collectedActionPoints) select _j select 1));
 
             // If _i is inside a cone with 20º half angle with origin on _j
-            if (_delta select 2 > 0.94) exitWith {
+            if ((_delta select 2 > 0.94) && {((GVAR(collectedActionPoints) select _i select 1) distance2d (GVAR(collectedActionPoints) select _j select 1)) < 0.1}) exitWith {
                 GVAR(collectedActionPoints) deleteAt _i;
             };
         };

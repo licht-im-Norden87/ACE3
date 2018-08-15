@@ -2,19 +2,13 @@
 
 ADDON = false;
 
-PREP(displayGrenadeTypeAndNumber);
-PREP(fireSmokeLauncher);
-PREP(playChangeFiremodeSound);
-PREP(putWeaponAway);
-PREP(selectNextGrenade);
-PREP(selectWeaponMode);
-PREP(selectWeaponMuzzle);
-PREP(selectWeaponVehicle);
-PREP(throwGrenade);
+PREP_RECOMPILE_START;
+#include "XEH_PREP.hpp"
+PREP_RECOMPILE_END;
 
 // collect frag and other grenades separately
-GVAR(GrenadesAll)     = [];
-GVAR(GrenadesFrag)    = [];
+GVAR(GrenadesAll) = [];
+GVAR(GrenadesFrag) = [];
 GVAR(GrenadesNonFrag) = [];
 
 {
@@ -31,5 +25,7 @@ GVAR(GrenadesNonFrag) = [];
     } count _magazines;
     false
 } count getArray (configFile >> "CfgWeapons" >> "Throw" >> "muzzles");
+
+#include "initSettings.sqf"
 
 ADDON = true;

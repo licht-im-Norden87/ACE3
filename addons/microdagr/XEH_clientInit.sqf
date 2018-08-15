@@ -4,23 +4,22 @@
 if (!hasInterface) exitWith {};
 
 //Add deviceKey entry:
-private ["_conditonCode", "_toggleCode", "_closeCode"];
-_conditonCode = {
+private _conditonCode = {
     ("ACE_microDAGR" in (items ACE_player))
 };
-_toggleCode = {
+private _toggleCode = {
     if !([ACE_player, objNull, ["notOnMap", "isNotInside", "isNotSitting"]] call EFUNC(common,canInteractWith)) exitWith {};
     [] call FUNC(openDisplay); //toggle display mode
 };
-_closeCode = {
+private _closeCode = {
     if (GVAR(currentShowMode) == DISPLAY_MODE_CLOSED) exitWith {};
     [DISPLAY_MODE_CLOSED] call FUNC(openDisplay);
 };
-[(localize LSTRING(itemName)), QUOTE(PATHTOF(images\microDAGR_item.paa)), _conditonCode, _toggleCode, _closeCode] call EFUNC(common,deviceKeyRegisterNew);
+[(localize LSTRING(itemName)), QPATHTOF(images\microDAGR_item.paa), _conditonCode, _toggleCode, _closeCode] call EFUNC(common,deviceKeyRegisterNew);
 
 
 //Add Eventhandler:
-["RangerfinderData", {_this call FUNC(recieveRangefinderData)}] call EFUNC(common,addEventHandler);
+[QEGVAR(vector,rangefinderData), {_this call FUNC(recieveRangefinderData)}] call CBA_fnc_addEventHandler;
 
 //Global Variables to default:
 GVAR(gpsPositionASL) = [0,0,0];

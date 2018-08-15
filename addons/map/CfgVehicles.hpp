@@ -10,7 +10,6 @@ class CfgVehicles {
                 exceptions[] = {"isNotDragging", "notOnMap", "isNotInside", "isNotSitting"};
                 insertChildren = QUOTE(_this call DFUNC(compileFlashlightMenu));
                 showDisabled = 0;
-                priority = 99;
             };
         };
     };
@@ -21,10 +20,10 @@ class CfgVehicles {
         category = "ACE";
         displayName = CSTRING(Module_DisplayName);
         function = QFUNC(moduleMap);
-        scope = 2;
+        scope = 1;
         isGlobal = 1;
         isSingular = 1;
-        icon = PATHTOF(UI\Icon_Module_Map_ca.paa);
+        icon = QPATHTOF(UI\Icon_Module_Map_ca.paa);
         class Arguments {
             class MapIllumination {
                 displayName = CSTRING(MapIllumination_DisplayName);
@@ -81,10 +80,10 @@ class CfgVehicles {
         category = "ACE";
         displayName = CSTRING(BFT_Module_DisplayName);
         function = QFUNC(blueForceTrackingModule);
-        scope = 2;
-        isGlobal = 0;
+        scope = 1;
+        isGlobal = 1;
         isSingular = 1;
-        icon = PATHTOF(UI\Icon_Module_BFTracking_ca.paa);
+        icon = QPATHTOF(UI\Icon_Module_BFTracking_ca.paa);
         class Arguments {
             class Enabled {
                 displayName = CSTRING(BFT_Enabled_DisplayName);
@@ -101,6 +100,12 @@ class CfgVehicles {
             class HideAiGroups {
                 displayName = CSTRING(BFT_HideAiGroups_DisplayName);
                 description = CSTRING(BFT_HideAiGroups_Description);
+                typeName = "BOOL";
+                defaultValue = 0;
+            };
+            class ShowPlayerNames {
+                displayName = CSTRING(BFT_ShowPlayerNames_DisplayName);
+                description = CSTRING(BFT_ShowPlayerNames_Description);
                 typeName = "BOOL";
                 defaultValue = 0;
             };

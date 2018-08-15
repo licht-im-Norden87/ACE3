@@ -1,20 +1,20 @@
 /*
  * Author: PabstMirror, ViperMaul
- * Find a safe place near a vehicle to unload something
- * Handles Normal Terrain, In Water or On Buildings (Pier, StaticShip)
+ * Find a safe place near a vehicle to unload something.
+ * Handles Normal Terrain, In Water or On Buildings (Pier, StaticShip).
  *
  * Arguments:
  * 0: Source Vehicle <OBJECT>
- * 1: Cargo Classname <STRING>
- * 2: Unloader (player) <OBJECT><OPTIONAL>
- * 3: Max Distance (meters) <NUMBER><OPTIONAL>
- * 4: Check Vehicle is Stable <BOOL><OPTIONAL>
+ * 1: Cargo <OBJECT> or <STRING>
+ * 2: Unloader (player) <OBJECT> (default: objNull)
+ * 3: Max Distance (meters) <NUMBER> (default: 10)
+ * 4: Check Vehicle is Stable <BOOL> (default: true)
  *
  * Return Value:
- * Unload PositionAGL (Can Be [] if no valid pos found) <ARRAY>
+ * Unload PositionAGL (can Be [] if no valid pos found) <ARRAY>
  *
  * Example:
- * [theCar, "CAManBase", player, 10, true] call ace_common_fnc_findUnloadPosition;
+ * [theCar, "CAManBase", player, 10, true] call ace_common_fnc_findUnloadPosition
  *
  * Public: No
  */
@@ -27,8 +27,8 @@
 //Manual collision tests (count and radius):
 #define COL_TEST_COUNT 12
 
-params ["_vehicle", "_typeOfCargo", ["_theUnloader", objNull], ["_maxDistance", 10], ["_checkVehicleIsStable", true]];
-TRACE_5("params",_vehicle,_typeOfCargo,_theUnloader,_maxDistance,_checkVehicleIsStable);
+params ["_vehicle", "_cargo", ["_theUnloader", objNull], ["_maxDistance", 10], ["_checkVehicleIsStable", true]];
+TRACE_5("params",_vehicle,_cargo,_theUnloader,_maxDistance,_checkVehicleIsStable);
 
 scopeName "main";
 
@@ -40,12 +40,22 @@ if (_checkVehicleIsStable) then {
 };
 
 private _radiusOfItem = 1;
-if (_typeOfCargo isKindOf "CAManBase") then {
+if (_cargo isKindOf "CAManBase") then {
     _radiusOfItem = 1.1;
 } else {
     //`sizeOf` is unreliable, and does not work with object types that don't exist on map, so estimate size based on cargo size
-    if (isNumber (configFile >> "CfgVehicles" >> _typeOfCargo >> QEGVAR(cargo,size))) then {
-        _radiusOfItem = (((getNumber (configFile >> "CfgVehicles" >> _typeOfCargo >> QEGVAR(cargo,size))) ^ 0.35) max 0.75);
+    private _typeOfCargo = if (_cargo isEqualType "") then {_cargo} else {typeOf _cargo};
+    private _itemSize = if (isNumber (configFile >> "CfgVehicles" >> _typeOfCargo >> QEGVAR(cargo,size)) && {getNumber (configFile >> "CfgVehicles" >> _typeOfCargo >> QEGVAR(cargo,size)) != -1}) then {
+        getNumber (configFile >> "CfgVehicles" >> _typeOfCargo >> QEGVAR(cargo,size));
+    } else {
+        if (["ace_cargo"] call FUNC(isModLoaded)) then {
+            [_cargo] call EFUNC(cargo,getSizeItem);
+        } else {
+            _radiusOfItem;
+        };
+    };
+    if (_itemSize != -1) then {
+        _radiusOfItem = (_itemSize ^ 0.35) max 0.75;
     };
 };
 
@@ -92,6 +102,15 @@ while {_rangeToCheck < _maxDistance} do {
             private _point1ASL = (AGLtoASL _roundAGL) vectorAdd [_radiusOfItem * cos _angle, _radiusOfItem * sin _angle, 0.1];
             private _point2ASL = (AGLtoASL _roundAGL) vectorAdd [-_radiusOfItem * cos _angle, -_radiusOfItem * sin _angle, (_radiusOfItem + 0.5)];
             private _testIntersections = lineIntersectsSurfaces [_point1ASL, _point2ASL];
+            if (((count _testIntersections) == 1) && {isNull ((_testIntersections select 0) select 2)}) then {
+                private _hitGroundASL = (_testIntersections select 0) select 0;
+                private _hitHeightOffset = ((AGLtoASL _roundAGL) select 2) - (_hitGroundASL select 2);
+                private _hit2dOffset = _roundAGL distance2D _hitGroundASL;
+                private _slope = _hitHeightOffset atan2 _hit2dOffset;
+                if (_slope < 25) then { //Ignore ground hit if slope is reasonable
+                    _testIntersections = [];
+                };
+            };
             if (!(_testIntersections isEqualTo [])) exitWith {
                 TRACE_2("collision low/high",_roundAGL,_testIntersections);
                 _roundPointIsValid = false;
